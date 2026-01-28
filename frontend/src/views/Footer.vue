@@ -18,25 +18,37 @@ const { t } = useI18n({
 </script>
 
 <template>
-    <div>
-        <n-divider class="footer-divider" />
-        <div style="text-align: center; padding: 20px">
-            <n-space justify="center">
-                <n-text depth="3">
-                    {{ t('copyright') }} © 2023-{{ new Date().getFullYear() }}
-                </n-text>
-                <n-text depth="3">
-                    <div v-html="openSettings.copyright"></div>
-                </n-text>
-            </n-space>
+    <footer class="footer">
+        <div class="app-container">
+            <n-divider class="footer-divider" />
+            <div class="footer-content">
+                <n-space justify="center" size="small" align="center" wrap>
+                    <n-text depth="3">
+                        {{ t('copyright') }} © 2023-{{ new Date().getFullYear() }}
+                    </n-text>
+                    <n-text depth="3">
+                        <span v-html="openSettings.copyright"></span>
+                    </n-text>
+                </n-space>
+            </div>
         </div>
-    </div>
+    </footer>
 </template>
 
 
 <style scoped>
+.footer {
+    padding: 4px 0 22px;
+}
+
 .footer-divider {
     margin: 0;
-    padding: 0 var(--x-padding);
+    opacity: 0.6;
+}
+
+.footer-content {
+    padding-top: 12px;
+    text-align: center;
+    color: var(--app-text-muted);
 }
 </style>

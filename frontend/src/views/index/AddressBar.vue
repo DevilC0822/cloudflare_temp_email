@@ -61,33 +61,35 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <n-card :bordered="false" embedded v-if="!settings.fetched">
-            <n-skeleton style="height: 50vh" />
-        </n-card>
-        <div v-else-if="settings.address">
-            <n-alert type="info" :show-icon="false" :bordered="false">
-                <AddressSelect>
-                    <template #actions>
-                        <n-button class="address-manage" size="small" tertiary type="primary"
-                            @click="showAddressManage = true">
-                            <n-icon :component="ExchangeAlt" />
-                            {{ t('addressManage') }}
-                        </n-button>
-                    </template>
-                </AddressSelect>
-            </n-alert>
+    <section class="address-bar">
+        <div v-if="!settings.fetched" class="address-card app-glass">
+            <n-skeleton style="height: 46vh" />
         </div>
-        <div v-else-if="isTelegram">
+
+        <div v-else-if="settings.address" class="address-card app-glass">
+            <AddressSelect>
+                <template #actions>
+                    <n-button class="address-manage" size="small" tertiary type="primary"
+                        @click="showAddressManage = true">
+                        <n-icon :component="ExchangeAlt" />
+                        {{ t('addressManage') }}
+                    </n-button>
+                </template>
+            </AddressSelect>
+        </div>
+
+        <div v-else-if="isTelegram" class="address-card app-glass">
             <TelegramAddress />
         </div>
+
         <div v-else-if="userJwt" class="center">
-            <n-card :bordered="false" embedded style="max-width: 900px; width: 100%;">
+            <div class="login-card app-glass">
                 <AddressManagement />
-            </n-card>
+            </div>
         </div>
+
         <div v-else class="center">
-            <n-card :bordered="false" embedded style="max-width: 600px;">
+            <div class="login-card app-glass">
                 <n-alert v-if="jwt" type="warning" :show-icon="false" :bordered="false" closable>
                     <span>{{ t('fetchAddressError') }}</span>
                 </n-alert>
@@ -99,8 +101,9 @@ onMounted(async () => {
                     </template>
                     {{ t('userLogin') }}
                 </n-button>
-            </n-card>
+            </div>
         </div>
+
         <n-modal v-model:show="showAddressCredential" preset="dialog" :title="t('addressCredential')">
             <span>
                 <p>{{ t("addressCredentialTip") }}</p>
@@ -127,18 +130,23 @@ onMounted(async () => {
             <AddressManagement v-else-if="userJwt" />
             <LocalAddress v-else />
         </n-modal>
-    </div>
+    </section>
 </template>
 
 <style scoped>
-.n-alert {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
+.address-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.n-card {
-    margin-top: 10px;
+.address-card {
+    padding: 12px;
+}
+
+.login-card {
+    width: min(680px, 100%);
+    padding: 14px;
 }
 
 .center {
@@ -146,7 +154,6 @@ onMounted(async () => {
     text-align: left;
     place-items: center;
     justify-content: center;
-    margin: 20px;
 }
 
 .address-manage {

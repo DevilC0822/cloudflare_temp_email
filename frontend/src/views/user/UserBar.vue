@@ -37,33 +37,38 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <n-card :bordered="false" embedded v-if="!userSettings.fetched">
-            <n-skeleton style="height: 50vh" />
-        </n-card>
-        <div v-else-if="userSettings.user_email">
-            <n-alert type="success" :show-icon="false" :bordered="false">
-                <span>
-                    <b>{{ t('currentUser') }} <b>{{ userSettings.user_email }}</b></b>
-                </span>
-            </n-alert>
+    <section class="user-bar">
+        <div v-if="!userSettings.fetched" class="userbar-card app-glass">
+            <n-skeleton style="height: 36vh" />
         </div>
+
+        <div v-else-if="userSettings.user_email" class="userbar-card app-glass userbar-success">
+            <n-space align="center" justify="space-between" :wrap="true">
+                <div class="userbar-title">
+                    {{ t('currentUser') }}
+                </div>
+                <n-tag type="success" size="small">
+                    {{ userSettings.user_email }}
+                </n-tag>
+            </n-space>
+        </div>
+
         <div v-else class="center">
-            <n-card :bordered="false" embedded style="max-width: 600px;">
+            <div class="login-card app-glass">
                 <n-alert v-if="userJwt" type="warning" :show-icon="false" :bordered="false" closable>
                     <span>{{ t('fetchUserSettingsError') }}</span>
                 </n-alert>
                 <UserLogin />
-            </n-card>
+            </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <style scoped>
-.n-alert {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
+.user-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .center {
@@ -71,6 +76,20 @@ onMounted(async () => {
     text-align: center;
     place-items: center;
     justify-content: center;
-    margin: 20px;
+}
+
+.userbar-card {
+    padding: 12px;
+}
+
+.login-card {
+    width: min(680px, 100%);
+    padding: 14px;
+    text-align: left;
+}
+
+.userbar-title {
+    font-weight: 600;
+    color: var(--app-text);
 }
 </style>

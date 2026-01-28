@@ -6,7 +6,7 @@ const { announcement } = useGlobalState()
 
 <template>
     <div class="center">
-        <n-card :bordered="false" embedded>
+        <n-card :bordered="false" embedded class="app-glass about-card">
             <div v-html="announcement"></div>
             <n-button tag="a" target="_blank" href="https://github.com/dreamhunter2333/cloudflare_temp_email">
                 <template #icon>
@@ -36,8 +36,8 @@ const { announcement } = useGlobalState()
     justify-content: center;
 }
 
-.n-card {
-    max-width: 800px;
+.about-card {
+    width: min(900px, 100%);
 }
 
 .n-button {

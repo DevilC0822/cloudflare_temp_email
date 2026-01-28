@@ -33,21 +33,35 @@ const { t } = useI18n({
 </script>
 
 <template>
-    <div>
+    <section class="user-page">
         <UserBar />
-        <n-tabs v-if="userSettings.user_email" type="card" v-model:value="userTab" :placement="globalTabplacement">
-            <n-tab-pane name="address_management" :tab="t('address_management')">
-                <AddressMangement />
-            </n-tab-pane>
-            <n-tab-pane name="user_mail_box_tab" :tab="t('user_mail_box_tab')">
-                <UserMailBox />
-            </n-tab-pane>
-            <n-tab-pane name="user_settings" :tab="t('user_settings')">
-                <UserSettingsPage />
-            </n-tab-pane>
-            <n-tab-pane name="bind_address" :tab="t('bind_address')">
-                <BindAddress />
-            </n-tab-pane>
-        </n-tabs>
-    </div>
+        <div v-if="userSettings.user_email" class="user-panel app-glass">
+            <n-tabs type="card" v-model:value="userTab" :placement="globalTabplacement">
+                <n-tab-pane name="address_management" :tab="t('address_management')">
+                    <AddressMangement />
+                </n-tab-pane>
+                <n-tab-pane name="user_mail_box_tab" :tab="t('user_mail_box_tab')">
+                    <UserMailBox />
+                </n-tab-pane>
+                <n-tab-pane name="user_settings" :tab="t('user_settings')">
+                    <UserSettingsPage />
+                </n-tab-pane>
+                <n-tab-pane name="bind_address" :tab="t('bind_address')">
+                    <BindAddress />
+                </n-tab-pane>
+            </n-tabs>
+        </div>
+    </section>
 </template>
+
+<style scoped>
+.user-page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-panel {
+    padding: 12px;
+}
+</style>

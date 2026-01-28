@@ -186,7 +186,8 @@ onMounted(async () => {
         </n-button>
       </template>
     </n-modal>
-    <n-tabs v-if="showAdminPage" type="card" v-model:value="adminTab" :placement="globalTabplacement">
+    <div v-if="showAdminPage" class="admin-panel app-glass">
+      <n-tabs type="card" v-model:value="adminTab" :placement="globalTabplacement">
       <n-tab-pane name="qucickSetup" :tab="t('qucickSetup')">
         <n-tabs type="bar" justify-content="center" animated>
           <n-tab-pane name="database" :tab="t('database')">
@@ -302,7 +303,8 @@ onMounted(async () => {
       <n-tab-pane name="about" :tab="t('about')">
         <About />
       </n-tab-pane>
-    </n-tabs>
+      </n-tabs>
+    </div>
     <n-modal v-model:show="showLogoutModal" preset="dialog" :title="t('logoutConfirmTitle')">
       <p>{{ t('logoutConfirmContent') }}</p>
       <template #action>
@@ -318,5 +320,9 @@ onMounted(async () => {
 .n-pagination {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+.admin-panel {
+  padding: 12px;
 }
 </style>

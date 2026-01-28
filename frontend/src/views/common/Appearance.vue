@@ -52,7 +52,7 @@ const { t } = useI18n({
 
 <template>
     <div class="center">
-        <n-card :bordered="false" embedded>
+        <n-card :bordered="false" embedded class="app-glass appearance-card">
             <n-form-item-row v-if="!isMobile" :label="t('mailboxSplitSize')">
                 <n-slider v-model:value="mailboxSplitSize" :min="0.25" :max="0.75" :step="0.01" :marks="{
                     0.25: '0.25',
@@ -99,8 +99,8 @@ const { t } = useI18n({
 }
 
 
-.n-card {
-    max-width: 800px;
+.appearance-card {
+    width: min(900px, 100%);
     text-align: left;
 }
 </style>

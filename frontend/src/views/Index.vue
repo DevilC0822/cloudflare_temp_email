@@ -130,62 +130,91 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div v-if="useSimpleIndex">
+  <section class="index-page">
+    <div v-if="useSimpleIndex" class="index-simple">
       <SimpleIndex />
     </div>
-    <div v-else>
+
+    <div v-else class="index-normal">
       <AddressBar />
-      <n-tabs v-if="settings.address" type="card" v-model:value="indexTab" :placement="globalTabplacement">
-        <template #prefix v-if="!isMobile">
-          <n-button @click="useSimpleIndex = true" tertiary size="small">
-            <template #icon>
-              <n-icon>
-                <FullscreenExitOutlined />
-              </n-icon>
-            </template>
-            {{ t('enterSimpleMode') }}
-          </n-button>
-        </template>
-        <n-tab-pane name="mailbox" :tab="t('mailbox')">
-          <div v-if="showMailIdQuery" style="margin-bottom: 10px;">
-            <n-input-group>
-              <n-input v-model:value="mailIdQuery" />
-              <n-button @click="queryMail" type="primary" tertiary>
-                {{ t('query') }}
-              </n-button>
-            </n-input-group>
-          </div>
-          <MailBox :key="mailBoxKey" :showEMailTo="false" :showReply="true" :showSaveS3="openSettings.isS3Enabled"
-            :saveToS3="saveToS3" :enableUserDeleteEmail="openSettings.enableUserDeleteEmail"
-            :fetchMailData="fetchMailData" :deleteMail="deleteMail" :showFilterInput="true" />
-        </n-tab-pane>
-        <n-tab-pane name="sendbox" :tab="t('sendbox')">
-          <SendBox :fetchMailData="fetchSenboxData" :enableUserDeleteEmail="openSettings.enableUserDeleteEmail"
-            :deleteMail="deleteSenboxMail" />
-        </n-tab-pane>
-        <n-tab-pane name="sendmail" :tab="t('sendmail')">
-          <SendMail />
-        </n-tab-pane>
-        <n-tab-pane name="accountSettings" :tab="t('accountSettings')">
-          <AccountSettings />
-        </n-tab-pane>
-        <n-tab-pane name="appearance" :tab="t('appearance')">
-          <Appearance :showUseSimpleIndex="true" />
-        </n-tab-pane>
-        <n-tab-pane v-if="openSettings.enableAutoReply" name="auto_reply" :tab="t('auto_reply')">
-          <AutoReply />
-        </n-tab-pane>
-        <n-tab-pane v-if="openSettings.enableWebhook" name="webhook" :tab="t('webhookSettings')">
-          <Webhook />
-        </n-tab-pane>
-        <n-tab-pane v-if="openSettings.isS3Enabled" name="s3_attachment" :tab="t('s3Attachment')">
-          <Attachment />
-        </n-tab-pane>
-        <n-tab-pane v-if="openSettings.enableIndexAbout" name="about" :tab="t('about')">
-          <About />
-        </n-tab-pane>
-      </n-tabs>
+
+      <div v-if="settings.address" class="index-panel app-glass">
+        <n-tabs type="card" v-model:value="indexTab" :placement="globalTabplacement">
+          <template #prefix v-if="!isMobile">
+            <n-button @click="useSimpleIndex = true" tertiary size="small">
+              <template #icon>
+                <n-icon>
+                  <FullscreenExitOutlined />
+                </n-icon>
+              </template>
+              {{ t('enterSimpleMode') }}
+            </n-button>
+          </template>
+
+          <n-tab-pane name="mailbox" :tab="t('mailbox')">
+            <div v-if="showMailIdQuery" class="mail-query">
+              <n-input-group>
+                <n-input v-model:value="mailIdQuery" />
+                <n-button @click="queryMail" type="primary" tertiary>
+                  {{ t('query') }}
+                </n-button>
+              </n-input-group>
+            </div>
+            <MailBox :key="mailBoxKey" :showEMailTo="false" :showReply="true" :showSaveS3="openSettings.isS3Enabled"
+              :saveToS3="saveToS3" :enableUserDeleteEmail="openSettings.enableUserDeleteEmail"
+              :fetchMailData="fetchMailData" :deleteMail="deleteMail" :showFilterInput="true" />
+          </n-tab-pane>
+
+          <n-tab-pane name="sendbox" :tab="t('sendbox')">
+            <SendBox :fetchMailData="fetchSenboxData" :enableUserDeleteEmail="openSettings.enableUserDeleteEmail"
+              :deleteMail="deleteSenboxMail" />
+          </n-tab-pane>
+
+          <n-tab-pane name="sendmail" :tab="t('sendmail')">
+            <SendMail />
+          </n-tab-pane>
+
+          <n-tab-pane name="accountSettings" :tab="t('accountSettings')">
+            <AccountSettings />
+          </n-tab-pane>
+
+          <n-tab-pane name="appearance" :tab="t('appearance')">
+            <Appearance :showUseSimpleIndex="true" />
+          </n-tab-pane>
+
+          <n-tab-pane v-if="openSettings.enableAutoReply" name="auto_reply" :tab="t('auto_reply')">
+            <AutoReply />
+          </n-tab-pane>
+
+          <n-tab-pane v-if="openSettings.enableWebhook" name="webhook" :tab="t('webhookSettings')">
+            <Webhook />
+          </n-tab-pane>
+
+          <n-tab-pane v-if="openSettings.isS3Enabled" name="s3_attachment" :tab="t('s3Attachment')">
+            <Attachment />
+          </n-tab-pane>
+
+          <n-tab-pane v-if="openSettings.enableIndexAbout" name="about" :tab="t('about')">
+            <About />
+          </n-tab-pane>
+        </n-tabs>
+      </div>
     </div>
-  </div>
+  </section>
 </template>
+
+<style scoped>
+.index-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.index-panel {
+  padding: 12px;
+}
+
+.mail-query {
+  margin-bottom: 10px;
+}
+</style>

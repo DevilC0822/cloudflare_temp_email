@@ -125,7 +125,10 @@ const clickRow = async (row) => {
 };
 
 const mailItemClass = (row) => {
-  return curMail.value && row.id == curMail.value.id ? (isDark.value ? 'overlay overlay-dark-backgroud' : 'overlay overlay-light-backgroud') : '';
+  if (curMail.value && row.id == curMail.value.id) {
+    return 'mail-row mail-row--active';
+  }
+  return 'mail-row';
 };
 
 const onSpiltSizeChange = (size) => {
@@ -239,7 +242,7 @@ onMounted(async () => {
       <n-split direction="horizontal" :max="0.75" :min="0.25" :default-size="mailboxSplitSize"
         :on-update:size="onSpiltSizeChange">
         <template #1>
-          <div style="overflow: auto; height: 80vh;">
+          <div class="mail-list-scroll">
             <n-list hoverable clickable>
               <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
                 :class="mailItemClass(row)">
@@ -267,8 +270,7 @@ onMounted(async () => {
           </div>
         </template>
         <template #2>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item" :title="curMail.subject"
-            style="overflow: auto; max-height: 100vh;">
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll" :title="curMail.subject">
             <n-space>
               <n-tag type="info">
                 ID: {{ curMail.id }}
@@ -312,7 +314,7 @@ onMounted(async () => {
           {{ t('refresh') }}
         </n-button>
       </div>
-      <div style="overflow: auto; height: 80vh;">
+      <div class="mail-list-scroll mail-list-scroll--mobile">
         <n-list hoverable clickable>
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
             <n-thing :title="row.subject">
@@ -380,22 +382,38 @@ onMounted(async () => {
   text-align: center;
 }
 
-.overlay {
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-
-.overlay-dark-backgroud {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.overlay-light-backgroud {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
 .mail-item {
   height: 100%;
+}
+
+.mail-list-scroll {
+  overflow: auto;
+  height: calc(100vh - 240px);
+  padding: 2px;
+  border-radius: var(--app-radius);
+}
+
+.mail-list-scroll--mobile {
+  height: calc(100vh - 320px);
+}
+
+.mail-row {
+  border-radius: 12px;
+  transition: background var(--app-duration) var(--app-ease), border-color var(--app-duration) var(--app-ease);
+}
+
+.mail-row--active {
+  background: rgba(37, 99, 235, 0.10);
+  border: 1px solid var(--app-border-strong);
+}
+
+.mail-content-scroll {
+  overflow: auto;
+  max-height: calc(100vh - 240px);
+}
+
+:global(html.dark) .mail-row--active {
+  background: rgba(96, 165, 250, 0.14);
 }
 
 pre {

@@ -46,22 +46,15 @@ onMounted(async () => {
 
 <template>
     <div class="center">
-        <n-card :bordered="false" embedded v-if="curMail.message" style="max-width: 800px; height: 100%;">
-            <n-tag type="info">
-                ID: {{ curMail.id }}
-            </n-tag>
-            <n-tag type="info">
-                Date: {{ utcToLocalDate(curMail.created_at, useUTCDate) }}
-            </n-tag>
-            <n-tag type="info">
-                FROM: {{ curMail.source }}
-            </n-tag>
-            <n-tag v-if="showEMailTo" type="info">
-                TO: {{ curMail.address }}
-            </n-tag>
-            <iframe :srcdoc="curMail.message" style="margin-top: 10px;width: 100%; height: 100%;">
-            </iframe>
-        </n-card>
+        <div v-if="curMail.message" class="mail-wrapper app-glass">
+            <n-space size="small" wrap>
+                <n-tag type="info">ID: {{ curMail.id }}</n-tag>
+                <n-tag type="info">{{ utcToLocalDate(curMail.created_at, useUTCDate) }}</n-tag>
+                <n-tag type="info">FROM: {{ curMail.source }}</n-tag>
+                <n-tag v-if="curMail.address" type="info">TO: {{ curMail.address }}</n-tag>
+            </n-space>
+            <iframe :srcdoc="curMail.message" class="mail-iframe"></iframe>
+        </div>
     </div>
 </template>
 
@@ -72,6 +65,20 @@ onMounted(async () => {
     text-align: left;
     place-items: center;
     justify-content: center;
-    height: 80vh;
+    min-height: 60vh;
+}
+
+.mail-wrapper {
+    width: min(900px, 100%);
+    padding: 12px;
+}
+
+.mail-iframe {
+    margin-top: 10px;
+    width: 100%;
+    height: 70vh;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    background: var(--app-surface-solid);
 }
 </style>

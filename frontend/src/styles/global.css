@@ -1,0 +1,147 @@
+/*
+  全局设计系统（轻量版）
+  - 颜色：统一的背景/表面/文字/边框/品牌色
+  - 排版：统一字体栈（无衬线 + 等宽）
+  - 形状：圆角/阴影/动效时长
+  - 适配：暗色模式（配合 @vueuse/core 的 useDark：默认给 html 加 .dark）
+*/
+
+:root {
+  /* 布局与间距 */
+  --app-max-width: 1120px;
+  --x-padding: clamp(14px, 4vw, 24px);
+  --app-radius: 14px;
+  --app-radius-sm: 10px;
+
+  /* 动效（克制、偏高级） */
+  --app-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-duration-fast: 160ms;
+  --app-duration: 220ms;
+
+  /* 字体（优先走系统字体，加载到 Google Fonts 后会自动命中） */
+  --app-font-sans: "Fira Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Apple Color Emoji", "Segoe UI Emoji";
+  --app-font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* 颜色（浅色） */
+  --app-bg: #f6f7fb;
+  --app-bg-glow-1: rgba(37, 99, 235, 0.10);
+  --app-bg-glow-2: rgba(14, 165, 233, 0.08);
+  --app-surface: rgba(255, 255, 255, 0.78);
+  --app-surface-solid: #ffffff;
+  --app-surface-2: rgba(248, 250, 252, 0.92);
+  --app-border: rgba(15, 23, 42, 0.12);
+  --app-border-strong: rgba(15, 23, 42, 0.18);
+  --app-text: #0f172a;
+  --app-text-muted: rgba(15, 23, 42, 0.68);
+  --app-brand: #2563eb;
+  --app-brand-2: #0ea5e9;
+
+  /* 阴影（更像“光影”，避免廉价厚重） */
+  --app-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06),
+    0 12px 30px rgba(15, 23, 42, 0.06);
+  --app-shadow-md: 0 8px 26px rgba(15, 23, 42, 0.10);
+  --app-backdrop: saturate(1.15) blur(14px);
+}
+
+html.dark {
+  --app-bg: #0b1220;
+  --app-bg-glow-1: rgba(96, 165, 250, 0.14);
+  --app-bg-glow-2: rgba(56, 189, 248, 0.10);
+  --app-surface: rgba(17, 25, 39, 0.72);
+  --app-surface-solid: #111927;
+  --app-surface-2: rgba(17, 25, 39, 0.52);
+  --app-border: rgba(148, 163, 184, 0.16);
+  --app-border-strong: rgba(148, 163, 184, 0.22);
+  --app-text: #e2e8f0;
+  --app-text-muted: rgba(226, 232, 240, 0.72);
+  --app-brand: #60a5fa;
+  --app-brand-2: #38bdf8;
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45),
+    0 14px 36px rgba(0, 0, 0, 0.35);
+  --app-shadow-md: 0 10px 34px rgba(0, 0, 0, 0.50);
+  --app-backdrop: saturate(1.2) blur(16px);
+}
+
+/* 基础样式 */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--app-text);
+  font-family: var(--app-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+
+  /* 高级感背景：轻微渐变 + 柔和光晕 */
+  background:
+    radial-gradient(900px 500px at 20% 0%, var(--app-bg-glow-1), transparent 55%),
+    radial-gradient(900px 500px at 90% 20%, var(--app-bg-glow-2), transparent 55%),
+    var(--app-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#app {
+  min-height: 100%;
+}
+
+/* 链接与选择文本 */
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.22);
+}
+
+html.dark ::selection {
+  background: rgba(96, 165, 250, 0.28);
+}
+
+/* 可访问性：清晰的键盘焦点 */
+:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.70);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+html.dark :focus-visible {
+  outline-color: rgba(96, 165, 250, 0.75);
+}
+
+/* 常用布局类：全站统一容器与玻璃卡片 */
+.app-container {
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 0 var(--x-padding);
+}
+
+.app-glass {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow-sm);
+  backdrop-filter: var(--app-backdrop);
+}
+
+/* 媒体元素默认不溢出（尤其是邮件/公告的富文本内容） */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}

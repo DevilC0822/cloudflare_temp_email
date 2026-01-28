@@ -2,7 +2,7 @@
 import { ref, h, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@unhead/vue'
-import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useIsMobile } from '../utils/composables'
 import {
     DarkModeFilled, LightModeFilled, MenuFilled,
@@ -18,7 +18,7 @@ const message = useMessage()
 const notification = useNotification()
 
 const {
-    toggleDark, isDark, isTelegram, showAdminPage,
+    toggleDark, isDark, isTelegram,
     showAuth, auth, loading, openSettings, userSettings
 } = useGlobalState()
 const route = useRoute()
@@ -40,6 +40,11 @@ const authFunc = async () => {
     }
 }
 
+const goTo = async (path) => {
+    await router.push(getRouterPathWithLang(path, locale.value));
+    showMobileMenu.value = false;
+}
+
 const changeLocale = async (lang) => {
     if (lang == 'zh') {
         await router.push(route.fullPath.replace('/en', ''));
@@ -52,6 +57,7 @@ const { locale, t } = useI18n({
     messages: {
         en: {
             title: 'Cloudflare Temp Email',
+            subtitle: 'Private, fast, and temporary inbox',
             dark: 'Dark',
             light: 'Light',
             accessHeader: 'Access Password',
@@ -59,10 +65,14 @@ const { locale, t } = useI18n({
             home: 'Home',
             menu: 'Menu',
             user: 'User',
+            admin: 'Admin',
             ok: 'OK',
+            toAdminHint: 'Click {count} more times to enter Admin',
+            goAdmin: 'Go to Admin',
         },
         zh: {
-            title: 'Cloudflare 临时邮件',
+            title: 'Cloudflare 临时邮箱',
+            subtitle: '简洁、安全的临时邮箱',
             dark: '暗色',
             light: '亮色',
             accessHeader: '访问密码',
@@ -70,7 +80,10 @@ const { locale, t } = useI18n({
             home: '主页',
             menu: '菜单',
             user: '用户',
+            admin: '管理',
             ok: '确定',
+            toAdminHint: '再点击 {count} 次进入管理',
+            goAdmin: '进入管理',
         }
     }
 });
@@ -85,10 +98,7 @@ const menuOptions = computed(() => [
                 size: "small",
                 type: menuValue.value == "home" ? "primary" : "default",
                 style: "width: 100%",
-                onClick: async () => {
-                    await router.push(getRouterPathWithLang('/', locale.value));
-                    showMobileMenu.value = false;
-                }
+                onClick: async () => await goTo('/')
             },
             {
                 default: () => t('home'),
@@ -104,10 +114,7 @@ const menuOptions = computed(() => [
                 size: "small",
                 type: menuValue.value == "user" ? "primary" : "default",
                 style: "width: 100%",
-                onClick: async () => {
-                    await router.push(getRouterPathWithLang("/user", locale.value));
-                    showMobileMenu.value = false;
-                }
+                onClick: async () => await goTo('/user')
             },
             {
                 default: () => t('user'),
@@ -127,17 +134,16 @@ const menuOptions = computed(() => [
                 style: "width: 100%",
                 onClick: async () => {
                     loading.value = true;
-                    await router.push(getRouterPathWithLang('/admin', locale.value));
+                    await goTo('/admin');
                     loading.value = false;
                     showMobileMenu.value = false;
                 }
             },
             {
-                default: () => "Admin",
+                default: () => t('admin'),
                 icon: () => h(NIcon, { component: AdminPanelSettingsFilled }),
             }
         ),
-        show: showAdminPage.value,
         key: "admin"
     },
     {
@@ -215,15 +221,15 @@ const logoClick = async () => {
     }
     if (logoClickCount.value >= 5) {
         logoClickCount.value = 0;
-        message.info("Change to admin Page");
+        message.info(t('goAdmin'));
         loading.value = true;
-        await router.push(getRouterPathWithLang('/admin', locale.value));
+        await goTo('/admin');
         loading.value = false;
     } else {
         logoClickCount.value++;
     }
     if (logoClickCount.value > 0) {
-        message.info(`Click ${5 - logoClickCount.value + 1} times to enter the admin page`);
+        message.info(t('toAdminHint', { count: 5 - logoClickCount.value + 1 }));
     }
 }
 
@@ -235,33 +241,64 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <n-page-header>
-            <template #title>
-                <h3>{{ openSettings.title || t('title') }}</h3>
-            </template>
-            <template #avatar>
-                <div @click="logoClick">
-                    <n-avatar style="margin-left: 10px;" src="/logo.png" />
+    <header class="app-header">
+        <div class="app-container">
+            <div class="header-card app-glass">
+                <div class="header-left" @click="logoClick" @keydown.enter.prevent="logoClick"
+                    @keydown.space.prevent="logoClick" role="button" tabindex="0" aria-label="logo">
+                    <n-avatar class="header-logo" src="/logo.png" />
+                    <div class="header-titles">
+                        <div class="header-title">
+                            {{ openSettings.title || t('title') }}
+                        </div>
+                        <div class="header-subtitle">
+                            {{ openSettings.description || t('subtitle') }}
+                        </div>
+                    </div>
                 </div>
-            </template>
-            <template #extra>
-                <n-space>
-                    <n-menu v-if="!isMobile" mode="horizontal" :options="menuOptions" responsive />
-                    <n-button v-else :text="true" @click="showMobileMenu = !showMobileMenu" style="margin-right: 10px;">
-                        <template #icon>
-                            <n-icon :component="MenuFilled" />
-                        </template>
-                        {{ t('menu') }}
+
+                <nav v-if="!isMobile" class="header-nav">
+                    <n-button quaternary :type="menuValue === 'home' ? 'primary' : 'default'" @click="goTo('/')">
+                        <template #icon><n-icon :component="Home" /></template>
+                        {{ t('home') }}
                     </n-button>
-                </n-space>
-            </template>
-        </n-page-header>
+                    <n-button v-if="!isTelegram" quaternary :type="menuValue === 'user' ? 'primary' : 'default'"
+                        @click="goTo('/user')">
+                        <template #icon><n-icon :component="User" /></template>
+                        {{ t('user') }}
+                    </n-button>
+                    <n-button quaternary :type="menuValue === 'admin' ? 'primary' : 'default'" @click="goTo('/admin')">
+                        <template #icon><n-icon :component="AdminPanelSettingsFilled" /></template>
+                        {{ t('admin') }}
+                    </n-button>
+                </nav>
+
+                <div class="header-actions">
+                    <n-button quaternary circle @click="toggleDark()" :aria-label="isDark ? t('light') : t('dark')">
+                        <n-icon :component="isDark ? LightModeFilled : DarkModeFilled" />
+                    </n-button>
+                    <n-button quaternary circle @click="locale == 'zh' ? changeLocale('en') : changeLocale('zh')"
+                        aria-label="language">
+                        <n-icon :component="Language" />
+                    </n-button>
+                    <n-button v-if="openSettings?.showGithub" quaternary tag="a" target="_blank"
+                        href="https://github.com/dreamhunter2333/cloudflare_temp_email">
+                        <template #icon><n-icon :component="GithubAlt" /></template>
+                        {{ version || 'GitHub' }}
+                    </n-button>
+                    <n-button v-if="isMobile" quaternary @click="showMobileMenu = true" aria-label="menu">
+                        <template #icon><n-icon :component="MenuFilled" /></template>
+                    </n-button>
+                </div>
+            </div>
+        </div>
+
         <n-drawer v-model:show="showMobileMenu" placement="top" style="height: 100vh;">
             <n-drawer-content :title="t('menu')" closable>
                 <n-menu :options="menuOptions" />
             </n-drawer-content>
         </n-drawer>
+
         <n-modal v-model:show="showAuth" :closable="false" :closeOnEsc="false" :maskClosable="false" preset="dialog"
             :title="t('accessHeader')">
             <p>{{ t('accessTip') }}</p>
@@ -272,14 +309,77 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-    </div>
+    </header>
 </template>
 
 <style scoped>
-.n-layout-header {
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 12px 0;
+}
+
+.header-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.header-logo {
+    flex: 0 0 auto;
+}
+
+.header-titles {
+    min-width: 0;
+    text-align: left;
+}
+
+.header-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-subtitle {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--app-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-nav {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    min-width: 0;
 }
 
 .n-alert {
