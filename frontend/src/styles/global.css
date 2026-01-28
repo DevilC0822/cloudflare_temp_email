@@ -145,3 +145,93 @@ video {
   max-width: 100%;
   height: auto;
 }
+
+/* -----------------------------
+  常用页面级工具类（减少各页面重复 CSS）
+------------------------------ */
+
+/* 页面容器：统一纵向间距 */
+.app-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 面板容器：通常与 .app-glass 搭配 */
+.app-panel {
+  padding: 12px;
+  text-align: left;
+}
+
+/* 居中布局：用于登录/设置等窄内容 */
+.app-center {
+  display: flex;
+  justify-content: center;
+}
+
+/* 次级文本 */
+.app-muted {
+  color: var(--app-text-muted);
+}
+
+/* 统一功能页布局：页面头 + 主操作 + 内容区 */
+.app-section {
+  padding: 12px;
+}
+
+.app-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.app-section__titles {
+  min-width: 0;
+}
+
+.app-section__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.app-section__body {
+  min-width: 0;
+}
+
+/* 跳转主内容（可访问性） */
+.app-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 10px;
+  z-index: 1000;
+  padding: 10px 12px;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-surface-solid);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.app-skip-link:focus {
+  left: 12px;
+}
+
+/* 动效降级：尊重系统“减少动效”偏好 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

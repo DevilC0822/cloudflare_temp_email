@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { User, UserCheck, MailBulk } from '@vicons/fa'
 import { SendOutlined } from '@vicons/material'
 
+import AppSection from '../../components/AppSection.vue'
 import { api } from '../../api'
 
 const message = useMessage()
@@ -11,6 +12,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Statistics',
+            refresh: 'Refresh',
             userCount: 'User Count',
             addressCount: 'Address Count',
             activeAddressCount7days: '7 days Active Address Count',
@@ -19,6 +22,8 @@ const { t } = useI18n({
             sendMailCount: 'Send Mail Count'
         },
         zh: {
+            title: '统计',
+            refresh: '刷新',
             userCount: '用户总数',
             addressCount: '邮箱地址总数',
             activeAddressCount7days: '7天活跃邮箱地址总数',
@@ -63,63 +68,83 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <n-card :bordered="false" embedded>
-            <n-row>
+    <AppSection :title="t('title')" :glass="false" class="admin-statistics">
+        <template #actions>
+            <n-button size="small" tertiary @click="fetchStatistics">
+                {{ t('refresh') }}
+            </n-button>
+        </template>
 
-                <n-col :span="8">
-                    <n-statistic :label="t('addressCount')" :value="statistics.addressCount">
-                        <template #prefix>
-                            <n-icon :component="User" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-                <n-col :span="8">
-                    <n-statistic :label="t('activeAddressCount7days')" :value="statistics.activeAddressCount7days">
-                        <template #prefix>
-                            <n-icon :component="UserCheck" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-                <n-col :span="8">
-                    <n-statistic :label="t('activeAddressCount30days')" :value="statistics.activeAddressCount30days">
-                        <template #prefix>
-                            <n-icon :component="UserCheck" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-            </n-row>
-        </n-card>
-        <n-card :bordered="false" embedded>
-            <n-row>
-                <n-col :span="8">
-                    <n-statistic :label="t('userCount')" :value="statistics.userCount">
-                        <template #prefix>
-                            <n-icon :component="User" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-                <n-col :span="8">
-                    <n-statistic :label="t('mailCount')" :value="statistics.mailCount">
-                        <template #prefix>
-                            <n-icon :component="MailBulk" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-                <n-col :span="8">
-                    <n-statistic :label="t('sendMailCount')" :value="statistics.sendMailCount">
-                        <template #prefix>
-                            <n-icon :component="SendOutlined" />
-                        </template>
-                    </n-statistic>
-                </n-col>
-            </n-row>
-        </n-card>
-    </div>
+        <div class="stats-grid">
+            <div class="stats-item">
+                <n-statistic :label="t('addressCount')" :value="statistics.addressCount">
+                    <template #prefix>
+                        <n-icon :component="User" />
+                    </template>
+                </n-statistic>
+            </div>
+            <div class="stats-item">
+                <n-statistic :label="t('activeAddressCount7days')" :value="statistics.activeAddressCount7days">
+                    <template #prefix>
+                        <n-icon :component="UserCheck" />
+                    </template>
+                </n-statistic>
+            </div>
+            <div class="stats-item">
+                <n-statistic :label="t('activeAddressCount30days')" :value="statistics.activeAddressCount30days">
+                    <template #prefix>
+                        <n-icon :component="UserCheck" />
+                    </template>
+                </n-statistic>
+            </div>
+            <div class="stats-item">
+                <n-statistic :label="t('userCount')" :value="statistics.userCount">
+                    <template #prefix>
+                        <n-icon :component="User" />
+                    </template>
+                </n-statistic>
+            </div>
+            <div class="stats-item">
+                <n-statistic :label="t('mailCount')" :value="statistics.mailCount">
+                    <template #prefix>
+                        <n-icon :component="MailBulk" />
+                    </template>
+                </n-statistic>
+            </div>
+            <div class="stats-item">
+                <n-statistic :label="t('sendMailCount')" :value="statistics.sendMailCount">
+                    <template #prefix>
+                        <n-icon :component="SendOutlined" />
+                    </template>
+                </n-statistic>
+            </div>
+        </div>
+    </AppSection>
 </template>
 
 <style scoped>
-.n-card {
-    margin-bottom: 20px;
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 12px;
+}
+
+@media (min-width: 720px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 980px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.stats-item {
+    padding: 12px;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    background: var(--app-surface-subtle);
 }
 </style>

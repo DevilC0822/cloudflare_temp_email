@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -15,6 +16,7 @@ const { t } = useI18n({
             manualInputPrompt: 'Type pattern and press Enter to add',
             save: 'Save',
             successTip: 'Save Success',
+            refresh: 'Refresh',
             enable_ip_blacklist: 'Enable IP Blacklist',
             enable_tip: 'Block IPs matching blacklist patterns from accessing rate-limited APIs',
             ip_blacklist: 'IP Blacklist Patterns',
@@ -38,6 +40,7 @@ const { t } = useI18n({
             manualInputPrompt: '输入匹配模式后按回车键添加',
             save: '保存',
             successTip: '保存成功',
+            refresh: '刷新',
             enable_ip_blacklist: '启用 IP 黑名单',
             enable_tip: '阻止匹配黑名单的 IP 访问限流 API',
             ip_blacklist: 'IP 黑名单匹配模式',
@@ -111,17 +114,20 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :title="t('title')" :bordered="false" embedded style="max-width: 800px;">
-            <template #header-extra>
-                <n-button @click="save" type="primary" :loading="loading">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="ip-blacklist-settings">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData" :loading="loading">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" @click="save" type="primary" :loading="loading">
                     {{ t('save') }}
                 </n-button>
             </template>
 
             <n-space vertical :size="20">
                 <n-alert :show-icon="false" :bordered="false" type="info">
-                    <div style="line-height: 1.8;">
+                    <div class="ip-blacklist-settings__tips">
                         <div><strong>{{ t("tip_scope") }}</strong></div>
                         <div>• {{ t("tip_ip") }}</div>
                         <div>• {{ t("tip_asn") }}</div>
@@ -132,19 +138,14 @@ onMounted(async () => {
 
                 <n-form-item-row :label="t('enable_ip_blacklist')">
                     <n-switch v-model:value="enabled" :round="false" />
-                    <n-text depth="3" style="margin-left: 10px; font-size: 12px;">
+                    <n-text depth="3" class="ip-blacklist-settings__hint">
                         {{ t('enable_tip') }}
                     </n-text>
                 </n-form-item-row>
 
                 <n-form-item-row :label="t('ip_blacklist')">
-                    <n-select
-                        v-model:value="ipBlacklist"
-                        filterable
-                        multiple
-                        tag
-                        :placeholder="t('ip_blacklist_placeholder')"
-                        :disabled="!enabled">
+                    <n-select v-model:value="ipBlacklist" filterable multiple tag
+                        :placeholder="t('ip_blacklist_placeholder')" :disabled="!enabled">
                         <template #empty>
                             <n-text depth="3">
                                 {{ t('manualInputPrompt') }}
@@ -154,13 +155,8 @@ onMounted(async () => {
                 </n-form-item-row>
 
                 <n-form-item-row :label="t('asn_blacklist')">
-                    <n-select
-                        v-model:value="asnBlacklist"
-                        filterable
-                        multiple
-                        tag
-                        :placeholder="t('asn_blacklist_placeholder')"
-                        :disabled="!enabled">
+                    <n-select v-model:value="asnBlacklist" filterable multiple tag
+                        :placeholder="t('asn_blacklist_placeholder')" :disabled="!enabled">
                         <template #empty>
                             <n-text depth="3">
                                 {{ t('manualInputPrompt') }}
@@ -170,13 +166,8 @@ onMounted(async () => {
                 </n-form-item-row>
 
                 <n-form-item-row :label="t('fingerprint_blacklist')">
-                    <n-select
-                        v-model:value="fingerprintBlacklist"
-                        filterable
-                        multiple
-                        tag
-                        :placeholder="t('fingerprint_blacklist_placeholder')"
-                        :disabled="!enabled">
+                    <n-select v-model:value="fingerprintBlacklist" filterable multiple tag
+                        :placeholder="t('fingerprint_blacklist_placeholder')" :disabled="!enabled">
                         <template #empty>
                             <n-text depth="3">
                                 {{ t('manualInputPrompt') }}
@@ -189,32 +180,37 @@ onMounted(async () => {
 
                 <n-form-item-row :label="t('enable_daily_limit')">
                     <n-switch v-model:value="enableDailyLimit" :round="false" />
-                    <n-text depth="3" style="margin-left: 10px; font-size: 12px;">
+                    <n-text depth="3" class="ip-blacklist-settings__hint">
                         {{ t('enable_daily_limit_tip') }}
                     </n-text>
                 </n-form-item-row>
 
                 <n-form-item-row :label="t('daily_request_limit')">
-                    <n-input-number
-                        v-model:value="dailyRequestLimit"
-                        :min="1"
-                        :max="1000000"
-                        :placeholder="t('daily_request_limit_placeholder')"
-                        :disabled="!enableDailyLimit"
-                        style="width: 100%;"
-                    />
+                    <n-input-number v-model:value="dailyRequestLimit" :min="1" :max="1000000"
+                        :placeholder="t('daily_request_limit_placeholder')" :disabled="!enableDailyLimit"
+                        class="ip-blacklist-settings__limit" />
                 </n-form-item-row>
             </n-space>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
+.ip-blacklist-settings {
+    width: min(980px, 100%);
     text-align: left;
-    place-items: center;
-    justify-content: center;
-    margin: 20px;
+}
+
+.ip-blacklist-settings__tips {
+    line-height: 1.8;
+}
+
+.ip-blacklist-settings__hint {
+    margin-left: 10px;
+    font-size: 12px;
+}
+
+.ip-blacklist-settings__limit {
+    width: 100%;
 }
 </style>

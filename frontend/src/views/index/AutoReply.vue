@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { onMounted, ref } from 'vue'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -20,7 +21,7 @@ const { t } = useI18n({
     messages: {
         en: {
             success: 'Success',
-            settings: 'Settings',
+            refresh: 'Refresh',
             sourcePrefix: 'Source Mail Prefix',
             name: 'Name',
             enableAutoReply: 'Enable Auto Reply',
@@ -30,7 +31,7 @@ const { t } = useI18n({
         },
         zh: {
             success: '成功',
-            settings: '设置',
+            refresh: '刷新',
             sourcePrefix: '来源邮件前缀',
             name: '名称',
             enableAutoReply: '启用自动回复',
@@ -80,12 +81,18 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded v-if="settings.address" :title='t("settings")'>
-            <div class="right">
-                <n-button type="primary" @click="saveData">{{ t('save') }}</n-button>
-            </div>
-            <div class="left">
+    <div class="app-center" v-if="settings.address">
+        <AppSection :title="t('autoReply')" :glass="false" class="autoreply-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="saveData">
+                    {{ t('save') }}
+                </n-button>
+            </template>
+
+            <div class="autoreply-form">
                 <n-form-item :label="t('enableAutoReply')" label-placement="left">
                     <n-switch v-model:value="enableAutoReply" />
                 </n-form-item>
@@ -102,35 +109,16 @@ onMounted(async () => {
                     <n-input :disabled="!enableAutoReply" type="textarea" v-model:value="autoReplyMessage" />
                 </n-form-item>
             </div>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-card {
-    max-width: 800px;
+.autoreply-section {
+    width: min(900px, 100%);
 }
 
-.n-button {
+.autoreply-form {
     text-align: left;
-}
-
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
-}
-
-.left {
-    text-align: left;
-    place-items: left;
-    justify-content: left;
-}
-
-.right {
-    text-align: right;
-    place-items: right;
-    justify-content: right;
 }
 </style>

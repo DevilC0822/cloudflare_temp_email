@@ -161,7 +161,7 @@ onMounted(async () => {
 
             <main class="app-main">
               <Header />
-              <div class="app-content">
+              <div id="main-content" class="app-content" tabindex="-1">
                 <div class="app-container">
                   <router-view></router-view>
                 </div>
@@ -183,13 +183,6 @@ onMounted(async () => {
   </n-config-provider>
 </template>
 
-
-<style>
-.n-switch {
-  margin-left: 10px;
-  margin-right: 10px;
-}
-</style>
 
 <style scoped>
 .app-shell {

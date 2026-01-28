@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
+
 // @ts-ignore
 import { useGlobalState } from '../../store'
 // @ts-ignore
@@ -12,6 +14,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Telegram',
+            refresh: 'Refresh',
             init: 'Init',
             successTip: 'Success',
             status: 'Check Status',
@@ -26,6 +30,8 @@ const { t } = useI18n({
             globalMailPushListTip: 'Support chat_id of private chat/group/channel. You can send a message to your bot, then visit this link to see chat_id, https://api.telegram.org/bot<Replace with your BOT TOKEN>/getUpdates',
         },
         zh: {
+            title: 'Telegram',
+            refresh: '刷新',
             init: '初始化',
             successTip: '成功',
             status: '查看状态',
@@ -115,20 +121,24 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded style="max-width: 800px; overflow: auto;">
-            <n-flex justify="end">
-                <n-button @click="fetchStatus" secondary>
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="telegram-settings">
+            <template #actions>
+                <n-button size="small" tertiary @click="getSettings">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" tertiary @click="fetchStatus">
                     {{ t('status') }}
                 </n-button>
-                <n-button @click="init" type="primary">
+                <n-button size="small" tertiary @click="init">
                     {{ t('init') }}
                 </n-button>
-                <n-button @click="saveSettings" type="primary">
+                <n-button size="small" type="primary" @click="saveSettings">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
-            <n-card :bordered="false" embedded>
+            </template>
+
+            <n-space vertical size="medium" class="telegram-settings__form">
                 <n-form-item-row :label="t('enableTelegramAllowList')">
                     <n-input-group>
                         <n-checkbox v-model:checked="settings.enableAllowList" style="width: 20%;">
@@ -144,7 +154,7 @@ onMounted(async () => {
                         </n-select>
                     </n-input-group>
                 </n-form-item-row>
-                <br />
+
                 <n-form-item-row :label="t('enableGlobalMailPush')">
                     <n-input-group>
                         <n-checkbox v-model:checked="settings.enableGlobalMailPush" style="width: 20%;">
@@ -165,21 +175,30 @@ onMounted(async () => {
                         </n-text>
                     </template>
                 </n-form-item-row>
-                <br />
+
                 <n-form-item-row :label="t('miniAppUrl')">
-                    <n-input v-model:value="settings.miniAppUrl"></n-input>
+                    <n-input v-model:value="settings.miniAppUrl" />
                 </n-form-item-row>
-            </n-card>
-            <pre v-if="status.fetched">{{ JSON.stringify(status, null, 2) }}</pre>
-        </n-card>
+            </n-space>
+
+            <pre v-if="status.fetched" class="telegram-settings__status">{{ JSON.stringify(status, null, 2) }}</pre>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
+.telegram-settings {
+    width: min(980px, 100%);
     text-align: left;
-    place-items: center;
-    justify-content: center;
+}
+
+.telegram-settings__status {
+    font-family: var(--app-font-mono);
+    font-size: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    background: var(--app-surface-subtle);
+    overflow: auto;
 }
 </style>

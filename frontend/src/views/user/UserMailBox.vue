@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { api } from '../../api'
 import MailBox from '../../components/MailBox.vue';
 
@@ -10,12 +11,16 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
-            addressQueryTip: 'Leave blank to query all addresses',
-            query: 'Query',
+            title: 'Mailbox',
+            refresh: 'Refresh',
+            addressQueryTip: 'Filter address (optional)',
+            query: 'Apply',
         },
         zh: {
-            addressQueryTip: '留空查询所有地址',
-            query: '查询',
+            title: '收件箱',
+            refresh: '刷新',
+            addressQueryTip: '地址筛选（可选）',
+            query: '筛选',
         }
     }
 });
@@ -69,16 +74,32 @@ onMounted(() => {
 </script>
 
 <template>
-    <div style="margin-top: 10px;">
-        <n-input-group>
+    <AppSection :title="t('title')" :glass="false" class="user-mailbox-section">
+        <template #actions>
+            <n-button size="small" tertiary @click="queryMail">
+                {{ t('refresh') }}
+            </n-button>
+        </template>
+
+        <n-flex align="center" class="user-mailbox-filter" :wrap="true">
             <n-select v-model:value="addressFilter" :options="addressFilterOptions" clearable
-                :placeholder="t('addressQueryTip')" />
+                :placeholder="t('addressQueryTip')" class="user-mailbox-select" />
             <n-button @click="queryMail" type="primary" tertiary>
                 {{ t('query') }}
             </n-button>
-        </n-input-group>
-        <div style="margin-top: 10px;"></div>
+        </n-flex>
         <MailBox :key="mailBoxKey" :enableUserDeleteEmail="true" :fetchMailData="fetchMailData"
             :deleteMail="deleteMail" :showFilterInput="true" />
-    </div>
+    </AppSection>
 </template>
+
+<style scoped>
+.user-mailbox-filter {
+    margin-bottom: 10px;
+}
+
+.user-mailbox-select {
+    min-width: 260px;
+    max-width: 520px;
+}
+</style>

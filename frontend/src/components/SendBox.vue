@@ -54,10 +54,10 @@ const { t } = useI18n({
       pleaseSelectMail: "Please select a mail to view.",
       delete: 'Delete',
       deleteMailTip: 'Are you sure you want to delete mail?',
-      multiAction: 'Multi Action',
-      cancelMultiAction: 'Cancel Multi Action',
-      selectAll: 'Select All of This Page',
-      unselectAll: 'Unselect All',
+      multiAction: 'Batch',
+      cancelMultiAction: 'Exit Batch',
+      selectAll: 'Select Page',
+      unselectAll: 'Clear',
     },
     zh: {
       success: '成功',
@@ -66,10 +66,10 @@ const { t } = useI18n({
       pleaseSelectMail: "请选择一封邮件查看。",
       delete: '删除',
       deleteMailTip: '确定要删除邮件吗?',
-      multiAction: '多选',
-      cancelMultiAction: '取消多选',
+      multiAction: '批量',
+      cancelMultiAction: '退出批量',
       selectAll: '全选本页',
-      unselectAll: '取消全选',
+      unselectAll: '清空',
     }
   }
 });
@@ -208,7 +208,7 @@ onMounted(async () => {
 <template>
   <div>
     <div v-if="!isMobile" class="left">
-      <div style="margin-bottom: 10px;">
+      <div class="sendbox-toolbar">
         <n-space v-if="multiActionMode">
           <n-button @click="multiActionModeClick(false)" tertiary>
             {{ t('cancelMultiAction') }}
@@ -251,18 +251,14 @@ onMounted(async () => {
                 </template>
                 <n-thing :title="row.subject">
                   <template #description>
-                    <n-tag type="info">
-                      ID: {{ row.id }}
-                    </n-tag>
-                    <n-tag type="info">
-                      {{ utcToLocalDate(row.created_at, useUTCDate) }}
-                    </n-tag>
-                    <n-tag v-if="showEMailFrom" type="info">
-                      FROM: {{ row.address }}
-                    </n-tag>
-                    <n-tag type="info">
-                      TO: {{ row.to_mail }}
-                    </n-tag>
+                    <n-text depth="3" class="sendbox-meta">
+                      #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+                    </n-text>
+                    <n-text depth="3" class="sendbox-meta">
+                      <n-ellipsis style="max-width: 520px;">
+                        {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
+                      </n-ellipsis>
+                    </n-text>
                   </template>
                 </n-thing>
               </n-list-item>
@@ -319,18 +315,14 @@ onMounted(async () => {
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
             <n-thing :title="row.subject">
               <template #description>
-                <n-tag type="info">
-                  ID: {{ row.id }}
-                </n-tag>
-                <n-tag type="info">
-                  {{ utcToLocalDate(row.created_at, useUTCDate) }}
-                </n-tag>
-                <n-tag v-if="showEMailFrom" type="info">
-                  FROM: {{ row.address }}
-                </n-tag>
-                <n-tag type="info">
-                  TO: {{ row.to_mail }}
-                </n-tag>
+                <n-text depth="3" class="sendbox-meta">
+                  #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+                </n-text>
+                <n-text depth="3" class="sendbox-meta">
+                  <n-ellipsis style="max-width: 520px;">
+                    {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
+                  </n-ellipsis>
+                </n-text>
               </template>
             </n-thing>
           </n-list-item>
@@ -391,6 +383,17 @@ onMounted(async () => {
   height: calc(100vh - 240px);
   padding: 2px;
   border-radius: var(--app-radius);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
+}
+
+.sendbox-toolbar {
+  margin-bottom: 10px;
+}
+
+.sendbox-meta {
+  display: block;
+  line-height: 1.3;
 }
 
 .mail-list-scroll--mobile {

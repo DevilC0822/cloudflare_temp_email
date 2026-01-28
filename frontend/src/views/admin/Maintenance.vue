@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { CleaningServicesFilled, AddFilled, DeleteFilled } from '@vicons/material'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -29,6 +30,8 @@ const cleanupModel = ref({
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Maintenance',
+            refresh: 'Refresh',
             tip: 'Please input the days',
             mailBoxLabel: 'Cleanup the inbox before n days',
             mailUnknowLabel: "Cleanup the unknow mail before n days",
@@ -54,6 +57,8 @@ const { t } = useI18n({
             deleteCustomSql: "Delete",
         },
         zh: {
+            title: '维护',
+            refresh: '刷新',
             tip: '请输入天数',
             mailBoxLabel: '清理 n 天前的收件箱',
             mailUnknowLabel: "清理 n 天前的无收件人邮件",
@@ -140,17 +145,21 @@ onMounted(async () => {
 
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded>
-            <n-alert :show-icon="false" :bordered="false" type="warning">
-                <span>{{ t('cronTip') }}</span>
-            </n-alert>
-            <n-flex justify="end">
-                <n-button @click="save" type="primary" :loading="loading">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="maintenance-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" @click="save" type="primary" :loading="loading">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
-            <n-tabs type="segment" style="margin-top: 16px;">
+            </template>
+
+            <n-alert :show-icon="false" :bordered="false" type="warning" class="maintenance-cron-tip">
+                <span>{{ t('cronTip') }}</span>
+            </n-alert>
+            <n-tabs type="segment" class="maintenance-tabs">
                 <n-tab-pane name="basic" :tab="t('basicCleanup')">
                     <n-form :model="cleanupModel">
                         <n-form-item-row :label="t('mailBoxLabel')">
@@ -240,7 +249,7 @@ onMounted(async () => {
                     </n-form>
                 </n-tab-pane>
                 <n-tab-pane name="custom_sql" :tab="t('customSqlCleanup')">
-                    <n-alert :show-icon="false" :bordered="false" type="info" style="margin-bottom: 16px;">
+                    <n-alert :show-icon="false" :bordered="false" type="info" class="maintenance-sql-tip">
                         <span>{{ t('customSqlTip') }}</span>
                     </n-alert>
                     <n-space vertical>
@@ -276,24 +285,26 @@ onMounted(async () => {
                     </n-space>
                 </n-tab-pane>
             </n-tabs>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-card {
-    max-width: 800px;
+.maintenance-section {
+    width: min(980px, 100%);
+    text-align: left;
 }
 
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
+.maintenance-cron-tip {
+    margin-bottom: 12px;
 }
 
-.n-alert {
-    margin-bottom: 20px;
+.maintenance-tabs {
+    margin-top: 12px;
+}
+
+.maintenance-sql-tip {
+    margin-bottom: 16px;
 }
 
 .sql-input {

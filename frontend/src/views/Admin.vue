@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useGlobalState } from '../store'
 import { api } from '../api'
@@ -37,6 +37,7 @@ const {
 } = useGlobalState()
 const message = useMessage()
 const router = useRouter()
+const route = useRoute()
 
 const SendMail = defineAsyncComponent(() => {
   loading.value = true;
@@ -86,7 +87,7 @@ const { t, locale } = useI18n({
       senderAccess: 'Sender Access Control',
       sendBox: 'Send Box',
       telegram: 'Telegram Bot',
-      webhookSettings: 'Webhook Settings',
+      webhookSettings: 'Webhook',
       statistics: 'Statistics',
       maintenance: 'Maintenance',
       database: 'Database',
@@ -126,7 +127,7 @@ const { t, locale } = useI18n({
       senderAccess: '发件权限控制',
       sendBox: '发件箱',
       telegram: '电报机器人',
-      webhookSettings: 'Webhook 设置',
+      webhookSettings: 'Webhook',
       statistics: '统计',
       maintenance: '维护',
       database: '数据库',
@@ -155,6 +156,39 @@ const showAdminPasswordModal = computed(() => !showAdminPage.value || showAdminA
 const tmpAdminAuth = ref('')
 // 判断是否通过 admin password 登录（而非用户管理员权限）
 const isAdminPasswordLogin = computed(() => !!adminAuth.value)
+
+const adminTabType = computed(() => {
+  const placement = globalTabplacement.value;
+  return placement === 'top' || placement === 'bottom' ? 'segment' : 'bar';
+});
+
+const syncAdminTabFromRoute = () => {
+  const tab = route.query.tab;
+  if (typeof tab !== 'string') return;
+  const available = new Set([
+    'qucickSetup',
+    'account',
+    'user',
+    'mails',
+    'telegram',
+    'statistics',
+    'maintenance',
+    'appearance',
+    'adminAccount',
+    'about',
+  ]);
+  if (available.has(tab)) adminTab.value = tab;
+};
+
+watch(() => route.query.tab, () => {
+  syncAdminTabFromRoute();
+}, { immediate: true });
+
+watch(adminTab, async (tab) => {
+  if (!tab) return;
+  if (route.query.tab === tab) return;
+  await router.replace({ query: { ...route.query, tab } });
+});
 
 // 获取当前登录方式
 const currentLoginMethod = computed(() => {
@@ -186,8 +220,8 @@ onMounted(async () => {
         </n-button>
       </template>
     </n-modal>
-    <div v-if="showAdminPage" class="admin-panel app-glass">
-      <n-tabs type="card" v-model:value="adminTab" :placement="globalTabplacement">
+    <div v-if="showAdminPage" class="app-panel app-glass">
+      <n-tabs :type="adminTabType" v-model:value="adminTab" :placement="globalTabplacement" animated>
       <n-tab-pane name="qucickSetup" :tab="t('qucickSetup')">
         <n-tabs type="bar" justify-content="center" animated>
           <n-tab-pane name="database" :tab="t('database')">
@@ -320,9 +354,5 @@ onMounted(async () => {
 .n-pagination {
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.admin-panel {
-  padding: 12px;
 }
 </style>

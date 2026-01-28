@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useIsMobile } from '../../utils/composables'
 import { useGlobalState } from '../../store'
 const props = defineProps({
@@ -19,6 +20,7 @@ const isMobile = useIsMobile()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Appearance',
             useSimpleIndex: 'Use Simple Index',
             mailboxSplitSize: 'Mailbox Split Size',
             useIframeShowMail: 'Use iframe Show HTML Mail',
@@ -33,6 +35,7 @@ const { t } = useI18n({
             autoRefreshInterval: 'Auto Refresh Interval(Sec)',
         },
         zh: {
+            title: '外观',
             useSimpleIndex: '使用极简主页',
             mailboxSplitSize: '邮箱界面分栏大小',
             preferShowTextMail: '默认以文本显示邮件',
@@ -51,8 +54,8 @@ const { t } = useI18n({
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded class="app-glass appearance-card">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="appearance-section">
             <n-form-item-row v-if="!isMobile" :label="t('mailboxSplitSize')">
                 <n-slider v-model:value="mailboxSplitSize" :min="0.25" :max="0.75" :step="0.01" :marks="{
                     0.25: '0.25',
@@ -88,18 +91,12 @@ const { t } = useI18n({
                     <n-radio-button value="bottom" :label="t('bottom')" />
                 </n-radio-group>
             </n-form-item-row>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    justify-content: center;
-}
-
-
-.appearance-card {
+.appearance-section {
     width: min(900px, 100%);
     text-align: left;
 }

@@ -3,6 +3,7 @@ import { ref, onMounted, h } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { NInputNumber, NTag, NSpace, NButton } from 'naive-ui';
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -12,6 +13,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Role Address Config',
+            refresh: 'Refresh',
             role: 'Role',
             maxAddressCount: 'Max Address Count',
             save: 'Save',
@@ -21,6 +24,8 @@ const { t } = useI18n({
             notConfigured: 'Not Configured (Use Global Settings)',
         },
         zh: {
+            title: '角色地址配置',
+            refresh: '刷新',
             role: '角色',
             maxAddressCount: '最大地址数量',
             save: '保存',
@@ -56,6 +61,11 @@ const fetchRoleConfigs = async () => {
         console.log(error)
         message.error(error.message || "error");
     }
+}
+
+const refreshData = async () => {
+    await fetchUserRoles();
+    await fetchRoleConfigs();
 }
 
 const saveConfig = async () => {
@@ -114,40 +124,37 @@ const columns = [
 ]
 
 onMounted(async () => {
-    await fetchUserRoles();
-    await fetchRoleConfigs();
+    await refreshData();
 })
 </script>
 
 <template>
-    <div style="margin-top: 10px;">
-        <n-alert type="info" :bordered="false" style="margin-bottom: 20px;">
-            {{ t('roleConfigDesc') }}
-        </n-alert>
+    <AppSection :title="t('title')" :description="t('roleConfigDesc')" :glass="false" class="role-address-config">
+        <template #actions>
+            <n-button size="small" tertiary @click="refreshData">
+                {{ t('refresh') }}
+            </n-button>
+            <n-button size="small" :loading="loading" @click="saveConfig" type="primary">
+                {{ t('save') }}
+            </n-button>
+        </template>
 
-        <n-alert v-if="systemRoles.length === 0" type="warning" :bordered="false">
+        <n-alert v-if="systemRoles.length === 0" type="warning" :bordered="false" :show-icon="false">
             {{ t('noRolesAvailable') }}
         </n-alert>
 
-        <div v-else>
-            <n-space justify="end" style="margin-bottom: 12px;">
-                <n-button :loading="loading" @click="saveConfig" type="primary">
-                    {{ t('save') }}
-                </n-button>
-            </n-space>
-
-            <n-data-table
-                :columns="columns"
-                :data="tableData"
-                :bordered="false"
-                embedded
-            />
+        <div v-else class="role-address-config__table">
+            <n-data-table :columns="columns" :data="tableData" :bordered="false" embedded />
         </div>
-    </div>
+    </AppSection>
 </template>
 
 <style scoped>
-.n-data-table {
+.role-address-config__table {
+    overflow: auto;
+}
+
+.role-address-config__table .n-data-table {
     min-width: 600px;
 }
 </style>

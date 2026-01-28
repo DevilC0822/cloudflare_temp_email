@@ -3,6 +3,7 @@ import { ref, h, onMounted, watch, computed } from 'vue';
 import { NBadge, useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 import { NButton, NMenu } from 'naive-ui';
@@ -17,6 +18,7 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Addresses',
             name: 'Name',
             created_at: 'Created At',
             updated_at: 'Update At',
@@ -53,8 +55,10 @@ const { t } = useI18n({
             multiClearInboxTip: 'Are you sure to clear inbox for selected addresses?',
             multiClearSentItems: 'Multi Clear Sent Items',
             multiClearSentItemsTip: 'Are you sure to clear sent items for selected addresses?',
+            refresh: 'Refresh',
         },
         zh: {
+            title: '邮箱地址',
             name: '名称',
             created_at: '创建时间',
             updated_at: '更新时间',
@@ -91,6 +95,7 @@ const { t } = useI18n({
             multiClearInboxTip: '确定要清空选中邮箱的收件箱吗？',
             multiClearSentItems: '批量清空发件箱',
             multiClearSentItemsTip: '确定要清空选中邮箱的发件箱吗？',
+            refresh: '刷新',
         }
     }
 });
@@ -495,7 +500,8 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div style="margin-top: 10px;">
+    <div class="app-center">
+        <div class="admin-account-wrap">
         <n-modal v-model:show="showEmailCredential" preset="dialog" title="Dialog">
             <template #header>
                 <div>{{ t("addressCredential") }}</div>
@@ -544,57 +550,8 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-        <n-input-group style="margin-bottom: 10px;">
-            <n-input v-model:value="addressQuery" clearable :placeholder="t('addressQueryTip')"
-                @keydown.enter="fetchData" />
-            <n-button @click="fetchData" type="primary" tertiary>
-                {{ t('query') }}
-            </n-button>
-        </n-input-group>
 
-        <n-space v-if="showMultiActionBar" style="margin-bottom: 10px;">
-            <n-button @click="multiActionSelectAll" tertiary>
-                {{ t('selectAll') }}
-            </n-button>
-            <n-button @click="multiActionUnselectAll" tertiary>
-                {{ t('unselectAll') }}
-            </n-button>
-            <n-popconfirm @positive-click="multiActionDeleteAccounts">
-                <template #trigger>
-                    <n-button tertiary type="error">{{ t('multiDelete') }}</n-button>
-                </template>
-                {{ t('multiDeleteTip') }}
-            </n-popconfirm>
-            <n-popconfirm @positive-click="multiActionClearInbox">
-                <template #trigger>
-                    <n-button tertiary type="warning">{{ t('multiClearInbox') }}</n-button>
-                </template>
-                {{ t('multiClearInboxTip') }}
-            </n-popconfirm>
-            <n-popconfirm @positive-click="multiActionClearSentItems">
-                <template #trigger>
-                    <n-button tertiary type="warning">{{ t('multiClearSentItems') }}</n-button>
-                </template>
-                {{ t('multiClearSentItemsTip') }}
-            </n-popconfirm>
-            <n-tag type="info">
-                {{ t('selectedItems') }}: {{ selectedCount }}
-            </n-tag>
-        </n-space>
-        <div style="overflow: auto;">
-            <div style="display: inline-block;">
-                <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
-                    :page-sizes="[20, 50, 100]" show-size-picker>
-                    <template #prefix="{ itemCount }">
-                        {{ t('itemCount') }}: {{ itemCount }}
-                    </template>
-                </n-pagination>
-            </div>
-            <n-data-table v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data" :bordered="false"
-                :row-key="row => row.id" embedded />
-        </div>
-
-        <!-- Multi-action progress modal -->
+        <!-- 批量操作进度 -->
         <n-modal v-model:show="showMultiActionModal" preset="dialog" :title="multiActionTitle" negative-text="OK">
             <n-space justify="center">
                 <n-progress type="circle" status="info" :percentage="multiActionProgress.percentage">
@@ -605,6 +562,63 @@ onMounted(async () => {
             </n-space>
         </n-modal>
 
+        <AppSection :title="t('title')" :glass="false" class="admin-account-section">
+            <template #actions>
+                <n-button tertiary @click="fetchData" :loading="loading">
+                    {{ t('refresh') }}
+                </n-button>
+            </template>
+
+            <n-input-group class="admin-account-query">
+                <n-input v-model:value="addressQuery" clearable :placeholder="t('addressQueryTip')"
+                    @keydown.enter="fetchData" />
+                <n-button @click="fetchData" type="primary" tertiary>
+                    {{ t('query') }}
+                </n-button>
+            </n-input-group>
+
+            <n-space v-if="showMultiActionBar" class="admin-account-batch">
+                <n-button @click="multiActionSelectAll" tertiary>
+                    {{ t('selectAll') }}
+                </n-button>
+                <n-button @click="multiActionUnselectAll" tertiary>
+                    {{ t('unselectAll') }}
+                </n-button>
+                <n-popconfirm @positive-click="multiActionDeleteAccounts">
+                    <template #trigger>
+                        <n-button tertiary type="error">{{ t('multiDelete') }}</n-button>
+                    </template>
+                    {{ t('multiDeleteTip') }}
+                </n-popconfirm>
+                <n-popconfirm @positive-click="multiActionClearInbox">
+                    <template #trigger>
+                        <n-button tertiary type="warning">{{ t('multiClearInbox') }}</n-button>
+                    </template>
+                    {{ t('multiClearInboxTip') }}
+                </n-popconfirm>
+                <n-popconfirm @positive-click="multiActionClearSentItems">
+                    <template #trigger>
+                        <n-button tertiary type="warning">{{ t('multiClearSentItems') }}</n-button>
+                    </template>
+                    {{ t('multiClearSentItemsTip') }}
+                </n-popconfirm>
+                <n-tag type="info">
+                    {{ t('selectedItems') }}: {{ selectedCount }}
+                </n-tag>
+            </n-space>
+
+            <div class="admin-account-table">
+                <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
+                    :page-sizes="[20, 50, 100]" show-size-picker>
+                    <template #prefix="{ itemCount }">
+                        {{ t('itemCount') }}: {{ itemCount }}
+                    </template>
+                </n-pagination>
+                <n-data-table v-model:checked-row-keys="checkedRowKeys" :columns="columns" :data="data"
+                    :bordered="false" :row-key="row => row.id" embedded />
+            </div>
+        </AppSection>
+        </div>
     </div>
 </template>
 
@@ -616,5 +630,26 @@ onMounted(async () => {
 
 .n-data-table {
     min-width: 1000px;
+}
+
+.admin-account-wrap {
+    width: min(1400px, 100%);
+}
+
+.admin-account-section {
+    width: 100%;
+}
+
+.admin-account-query {
+    margin-bottom: 10px;
+}
+
+.admin-account-batch {
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-account-table {
+    overflow: auto;
 }
 </style>

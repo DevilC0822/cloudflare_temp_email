@@ -5,6 +5,8 @@ import { useMessage } from 'naive-ui'
 // @ts-ignore
 import { api } from '../../api'
 
+import AppSection from '../../components/AppSection.vue'
+
 const message = useMessage()
 
 const { t } = useI18n({
@@ -13,6 +15,7 @@ const { t } = useI18n({
             title: 'AI Email Extraction Settings',
             successTip: 'Success',
             save: 'Save',
+            refresh: 'Refresh',
             enableAllowList: 'Enable Address Allowlist',
             enableAllowListTip: 'When enabled, AI extraction will only process emails sent to addresses in the allowlist',
             allowList: 'Address Allowlist (Enter address and press Enter, wildcards supported)',
@@ -24,6 +27,7 @@ const { t } = useI18n({
             title: 'AI 邮件提取设置',
             successTip: '成功',
             save: '保存',
+            refresh: '刷新',
             enableAllowList: '启用地址白名单',
             enableAllowListTip: '启用后，AI 提取功能仅对白名单中的邮箱地址生效',
             allowList: '地址白名单 (请输入地址并回车，支持通配符)',
@@ -71,24 +75,28 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :title="t('title')" :bordered="false" embedded style="max-width: 800px; overflow: auto;">
-            <n-flex justify="end">
-                <n-button @click="saveSettings" type="primary">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="ai-extract-settings">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="saveSettings">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
+            </template>
 
             <n-form-item-row :label="t('enableAllowList')">
                 <n-switch v-model:value="settings.enableAllowList" :round="false" />
             </n-form-item-row>
 
-            <n-alert v-if="!settings.enableAllowList" type="info" style="margin-bottom: 16px;">
+            <n-alert v-if="!settings.enableAllowList" type="info" :bordered="false" :show-icon="false"
+                style="margin-bottom: 16px;">
                 {{ t('disabledTip') }}
             </n-alert>
 
             <div v-if="settings.enableAllowList">
-                <n-alert type="warning" style="margin-bottom: 16px;">
+                <n-alert type="warning" :bordered="false" :show-icon="false" style="margin-bottom: 16px;">
                     {{ t('enableAllowListTip') }}
                 </n-alert>
 
@@ -107,19 +115,13 @@ onMounted(async () => {
                     {{ t('allowListTip') }}
                 </n-text>
             </div>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
+.ai-extract-settings {
+    width: min(900px, 100%);
     text-align: left;
-    place-items: center;
-    justify-content: center;
-}
-
-.n-button {
-    margin-top: 10px;
 }
 </style>

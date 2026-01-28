@@ -1,13 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { startRegistration } from '@simplewebauthn/browser';
 import { NButton, NPopconfirm } from 'naive-ui'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
-const { userJwt, userSettings, } = useGlobalState()
+const { userJwt, userSettings, loading } = useGlobalState()
 const message = useMessage()
 
 const showLogout = ref(false)
@@ -21,6 +22,7 @@ const currentPasskeyName = ref('')
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Account & Security',
             logout: 'Logout',
             logoutConfirm: 'Are you sure you want to logout?',
             passordTip: 'The server will only receive the hash value of the password, and will not receive the plaintext password, so it cannot view or retrieve your password. If the administrator enables email verification, you can reset the password in incognito mode',
@@ -38,6 +40,7 @@ const { t } = useI18n({
             renamePasskeyNamePlaceholder: 'Please enter the new passkey name',
         },
         zh: {
+            title: '账号与安全',
             logout: '退出登录',
             logoutConfirm: '确定要退出登录吗？',
             passordTip: '服务器只会接收到密码的哈希值，不会接收到明文密码，因此无法查看或者找回您的密码, 如果管理员启用了邮件验证您可以在无痕模式重置密码',
@@ -190,26 +193,34 @@ const renamePasskey = async () => {
         showRenamePasskey.value = false
     }
 }
+
+const openPasskeyList = async () => {
+    showPasskeyList.value = true
+    await fetchPasskeyList()
+}
 </script>
 
 <template>
-    <div class="center" v-if="userSettings.user_email">
-        <n-card :bordered="false" embedded>
-            <n-button @click="showPasskeyList = true; fetchPasskeyList();" secondary block strong>
-                {{ t('showPasskeyList') }}
-            </n-button>
-            <n-button @click="showCreatePasskey = true" type="primary" secondary block strong>
-                {{ t('createPasskey') }}
-            </n-button>
-            <n-alert :show-icon="false" :bordered="false">
-                <span>
-                    {{ t('passordTip') }}
-                </span>
-            </n-alert>
-            <n-button @click="showLogout = true" secondary block strong>
-                {{ t('logout') }}
-            </n-button>
-        </n-card>
+    <div class="app-center" v-if="userSettings.user_email">
+        <AppSection :title="t('title')" :glass="false" class="user-settings-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="openPasskeyList">
+                    {{ t('showPasskeyList') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="showCreatePasskey = true">
+                    {{ t('createPasskey') }}
+                </n-button>
+            </template>
+
+            <n-space vertical size="small">
+                <n-alert :show-icon="false" :bordered="false">
+                    <span>{{ t('passordTip') }}</span>
+                </n-alert>
+                <n-button @click="showLogout = true" secondary>
+                    {{ t('logout') }}
+                </n-button>
+            </n-space>
+        </AppSection>
         <n-modal v-model:show="showCreatePasskey" preset="dialog" :title="t('createPasskey')">
             <n-input v-model:value="passkeyName" :placeholder="t('passkeyNamePlaceholder')" />
             <template #action>
@@ -241,19 +252,8 @@ const renamePasskey = async () => {
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    justify-content: center;
-}
-
-
-.n-card {
-    max-width: 800px;
+.user-settings-section {
+    width: min(900px, 100%);
     text-align: left;
-}
-
-.n-button {
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 </style>

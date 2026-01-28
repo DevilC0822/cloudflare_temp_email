@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -11,6 +12,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'User Settings',
+            refresh: 'Refresh',
             save: 'Save',
             successTip: 'Save Success',
             enable: 'Enable',
@@ -23,6 +26,8 @@ const { t } = useI18n({
             maxAddressCount: 'Maximum number of email addresses that can be binded',
         },
         zh: {
+            title: '用户设置',
+            refresh: '刷新',
             save: '保存',
             successTip: '保存成功',
             enable: '启用',
@@ -83,13 +88,17 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded style="max-width: 600px;">
-            <n-flex justify="end">
-                <n-button @click="save" type="primary" :loading="loading">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="user-settings-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="save" :loading="loading">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
+            </template>
+
             <n-form :model="userSettings">
                 <n-form-item-row :label="t('enableUserRegister')">
                     <n-switch v-model:value="userSettings.enable" :round="false" />
@@ -126,15 +135,13 @@ onMounted(async () => {
                     </n-input-group>
                 </n-form-item-row>
             </n-form>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
+.user-settings-section {
+    width: min(720px, 100%);
     text-align: left;
-    place-items: center;
-    justify-content: center;
 }
 </style>

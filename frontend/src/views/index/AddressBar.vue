@@ -61,12 +61,12 @@ onMounted(async () => {
 </script>
 
 <template>
-    <section class="address-bar">
-        <div v-if="!settings.fetched" class="address-card app-glass">
+    <section class="app-page">
+        <div v-if="!settings.fetched" class="app-panel app-glass">
             <n-skeleton style="height: 46vh" />
         </div>
 
-        <div v-else-if="settings.address" class="address-card app-glass">
+        <div v-else-if="settings.address" class="app-panel app-glass">
             <AddressSelect>
                 <template #actions>
                     <n-button class="address-manage" size="small" tertiary type="primary"
@@ -78,7 +78,7 @@ onMounted(async () => {
             </AddressSelect>
         </div>
 
-        <div v-else-if="isTelegram" class="address-card app-glass">
+        <div v-else-if="isTelegram" class="app-panel app-glass">
             <TelegramAddress />
         </div>
 
@@ -134,16 +134,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.address-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.address-card {
-    padding: 12px;
-}
-
 .login-card {
     width: min(680px, 100%);
     padding: 14px;

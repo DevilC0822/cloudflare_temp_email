@@ -2,9 +2,10 @@
 import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { useI18n } from 'vue-i18n'
-import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
 import AdminContact from '../common/AdminContact.vue'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -19,36 +20,44 @@ const { t } = useI18n({
     locale: 'zh',
     messages: {
         en: {
+            title: 'Send Mail',
             successSend: 'Please check your sendbox. If failed, please check your balance or try again later.',
-            fromName: 'Your Name and Address, leave Name blank to use email address',
-            toName: 'Recipient Name and Address, leave Name blank to use email address',
+            fromName: 'From',
+            fromNamePlaceholder: 'Name (optional)',
+            toName: 'To',
+            toNamePlaceholder: 'Name (optional)',
+            toMailPlaceholder: 'Email address',
             subject: 'Subject',
-            options: 'Options',
+            options: 'Format',
             edit: 'Edit',
             preview: 'Preview',
-            content: 'Content',
+            content: 'Body',
             send: 'Send',
             requestAccess: 'Request Access',
             requestAccessTip: 'You need to request access to send mail, if have request, please contact admin.',
-            send_balance: 'Send Mail Balance Left',
+            send_balance: 'Balance',
             text: 'Text',
             html: 'HTML',
             'rich text': 'Rich Text',
             tooLarge: 'Too large file, please upload file less than 1MB.',
         },
         zh: {
+            title: '发送邮件',
             successSend: '请查看您的发件箱, 如果失败, 请检查您的余额或稍后重试。',
-            fromName: '你的名称和地址，名称不填写则使用邮箱地址',
-            toName: '收件人名称和地址，名称不填写则使用邮箱地址',
+            fromName: '发件人',
+            fromNamePlaceholder: '名称（可选）',
+            toName: '收件人',
+            toNamePlaceholder: '名称（可选）',
+            toMailPlaceholder: '邮箱地址',
             subject: '主题',
-            options: '选项',
+            options: '格式',
             edit: '编辑',
             preview: '预览',
             content: '内容',
             send: '发送',
             requestAccess: '申请权限',
-            requestAccessTip: '您需要申请权限才能发送邮件, 如果已经申请过, 请联系管理员提升额度。',
-            send_balance: '剩余发送邮件额度',
+            requestAccessTip: '暂无发件额度，可申请或联系管理员。',
+            send_balance: '剩余额度',
             text: '文本',
             html: 'HTML',
             'rich text': '富文本',
@@ -88,10 +97,10 @@ const send = async () => {
         }
     } catch (error) {
         message.error(error.message || "error");
-    } finally {
-        message.success(t("successSend"));
-        indexTab.value = 'sendbox'
+        return
     }
+    message.success(t("successSend"));
+    indexTab.value = 'sendbox'
 }
 
 const requestAccess = async () => {
@@ -140,11 +149,24 @@ onMounted(async () => {
     if (!userSettings.value.user_id) await api.getUserSettings(message);
     await api.getSettings();
 })
+
+const balanceText = computed(() => {
+    const balance = settings.value?.send_balance;
+    if (typeof balance !== 'number') return '';
+    return `${t('send_balance')}：${balance}`;
+})
 </script>
 
 <template>
-    <div class="center" v-if="settings.address">
-        <n-card :bordered="false" embedded>
+    <div class="app-center" v-if="settings.address">
+        <AppSection :title="t('title')" :description="balanceText" :glass="false" class="sendmail-section">
+            <template #actions>
+                <n-button v-if="settings.send_balance && settings.send_balance > 0" type="primary" size="small"
+                    @click="send">
+                    {{ t('send') }}
+                </n-button>
+            </template>
+
             <div v-if="!settings.send_balance || settings.send_balance <= 0">
                 <n-alert type="warning" :show-icon="false" :bordered="false">
                     {{ t('requestAccessTip') }}
@@ -154,45 +176,41 @@ onMounted(async () => {
                 <AdminContact />
             </div>
             <div v-else>
-                <n-alert type="info" :show-icon="false" :bordered="false" closable>
-                    {{ t('send_balance') }}: {{ settings.send_balance }}
-                </n-alert>
-                <n-flex justify="end">
-                    <n-button type="primary" @click="send">{{ t('send') }}</n-button>
-                </n-flex>
-                <div class="left">
+                <div class="sendmail-form">
                     <n-form :model="sendMailModel">
                         <n-form-item :label="t('fromName')" label-placement="top">
                             <n-input-group>
-                                <n-input v-model:value="sendMailModel.fromName" />
+                                <n-input v-model:value="sendMailModel.fromName" :placeholder="t('fromNamePlaceholder')" />
                                 <n-input :value="settings.address" disabled />
                             </n-input-group>
                         </n-form-item>
                         <n-form-item :label="t('toName')" label-placement="top">
                             <n-input-group>
-                                <n-input v-model:value="sendMailModel.toName" />
-                                <n-input v-model:value="sendMailModel.toMail" />
+                                <n-input v-model:value="sendMailModel.toName" :placeholder="t('toNamePlaceholder')" />
+                                <n-input v-model:value="sendMailModel.toMail" :placeholder="t('toMailPlaceholder')" />
                             </n-input-group>
                         </n-form-item>
                         <n-form-item :label="t('subject')" label-placement="top">
                             <n-input v-model:value="sendMailModel.subject" />
                         </n-form-item>
                         <n-form-item :label="t('options')" label-placement="top">
-                            <n-radio-group v-model:value="sendMailModel.contentType">
-                                <n-radio-button v-for="option in contentTypes" :key="option.value" :value="option.value"
-                                    :label="option.label" />
-                            </n-radio-group>
-                            <n-button v-if="sendMailModel.contentType != 'text'" @click="isPreview = !isPreview"
-                                style="margin-left: 10px;">
-                                {{ isPreview ? t('edit') : t('preview') }}
-                            </n-button>
+                            <n-flex align="center" justify="space-between" class="sendmail-options">
+                                <n-radio-group v-model:value="sendMailModel.contentType">
+                                    <n-radio-button v-for="option in contentTypes" :key="option.value"
+                                        :value="option.value" :label="option.label" />
+                                </n-radio-group>
+                                <n-button v-if="sendMailModel.contentType != 'text'" @click="isPreview = !isPreview"
+                                    tertiary>
+                                    {{ isPreview ? t('edit') : t('preview') }}
+                                </n-button>
+                            </n-flex>
                         </n-form-item>
                         <n-form-item :label="t('content')" label-placement="top">
                             <n-card :bordered="false" embedded v-if="isPreview">
                                 <div v-html="sendMailModel.content" />
                             </n-card>
-                            <div v-else-if="sendMailModel.contentType == 'rich'" style="border: 1px solid #ccc">
-                                <Toolbar style="border-bottom: 1px solid #ccc" :defaultConfig="toolbarConfig"
+                            <div v-else-if="sendMailModel.contentType == 'rich'" class="sendmail-rich-editor">
+                                <Toolbar class="sendmail-rich-toolbar" :defaultConfig="toolbarConfig"
                                     :editor="editorRef" mode="default" />
                                 <Editor style="height: 500px; overflow-y: hidden;" v-model="sendMailModel.content"
                                     :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated" />
@@ -204,34 +222,30 @@ onMounted(async () => {
                     </n-form>
                 </div>
             </div>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-card {
-    max-width: 800px;
+.sendmail-section {
+    width: min(900px, 100%);
 }
 
-.n-button {
+.sendmail-form {
     text-align: left;
-    margin-right: 10px;
 }
 
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
+.sendmail-options {
+    width: 100%;
 }
 
-.left {
-    text-align: left;
-    place-items: left;
-    justify-content: left;
+.sendmail-rich-editor {
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    overflow: hidden;
 }
 
-.n-alert {
-    margin-bottom: 10px;
+.sendmail-rich-toolbar {
+    border-bottom: 1px solid var(--app-border);
 }
 </style>

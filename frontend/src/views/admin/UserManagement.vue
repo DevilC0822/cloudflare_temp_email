@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { NMenu, NButton, NBadge, NTag } from 'naive-ui';
 import { MenuFilled } from '@vicons/material'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 import { hashPassword } from '../../utils';
@@ -16,6 +17,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'User Management',
+            refresh: 'Refresh',
             success: 'Success',
             user_email: 'User Email',
             role: 'Role',
@@ -39,6 +42,8 @@ const { t } = useI18n({
             userAddressManagement: 'Address Management',
         },
         zh: {
+            title: '用户管理',
+            refresh: '刷新',
             success: '成功',
             user_email: '用户邮箱',
             role: '角色',
@@ -346,7 +351,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div style="margin-top: 10px;">
+    <div>
         <n-modal v-model:show="showCreateUser" preset="dialog" :title="t('createUser')">
             <n-form>
                 <n-form-item-row :label="t('email')" required>
@@ -384,8 +389,8 @@ onMounted(async () => {
             <n-alert type="error" :bordered="false" v-if="roleDonotExist">
                 <span>{{ t('roleDonotExist') }}</span>
             </n-alert>
-            <p>{{ t('prefix') + ": " + getRolePrefix(curUserRole) }}</p>
-            <p>{{ t('domains') + ": " + JSON.stringify(getRoleDomains(curUserRole)) }}</p>
+            <p>{{ t('prefix') + ': ' + getRolePrefix(curUserRole) }}</p>
+            <p>{{ t('domains') + ': ' + JSON.stringify(getRoleDomains(curUserRole)) }}</p>
             <n-select clearable v-model:value="curUserRole" :options="userRolesOptions" />
             <template #action>
                 <n-button :loading="loading" @click="changeRole" size="small" tertiary type="primary">
@@ -396,39 +401,50 @@ onMounted(async () => {
         <n-modal v-model:show="showUserAddressManagement" preset="card" :title="t('userAddressManagement')">
             <UserAddressManagement :user_id="curUserId" />
         </n-modal>
-        <n-input-group>
-            <n-input v-model:value="userQuery" @keydown.enter="fetchData" />
-            <n-button @click="fetchData" type="primary" tertiary>
-                {{ t('query') }}
-            </n-button>
-        </n-input-group>
-        <div style="overflow: auto;">
-            <div style="display: inline-block;">
-                <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
-                    :page-sizes="[20, 50, 100]" show-size-picker>
+
+        <AppSection :title="t('title')" :glass="false" class="user-management-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="showCreateUser = true">
+                    {{ t('createUser') }}
+                </n-button>
+            </template>
+
+            <n-flex vertical size="small" class="user-management">
+                <n-input-group class="user-management__query">
+                    <n-input v-model:value="userQuery" @keydown.enter="fetchData" />
+                    <n-button @click="fetchData" type="primary" tertiary>
+                        {{ t('query') }}
+                    </n-button>
+                </n-input-group>
+
+                <n-pagination class="user-management__pager" v-model:page="page" v-model:page-size="pageSize"
+                    :item-count="count" :page-sizes="[20, 50, 100]" show-size-picker>
                     <template #prefix="{ itemCount }">
                         {{ t('itemCount') }}: {{ itemCount }}
                     </template>
-                    <template #suffix>
-                        <n-button @click="showCreateUser = true" size="small" tertiary type="primary"
-                            style="margin-left: 10px">
-                            {{ t('createUser') }}
-                        </n-button>
-                    </template>
                 </n-pagination>
-            </div>
-            <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
-        </div>
+
+                <div class="user-management__table">
+                    <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                </div>
+            </n-flex>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-pagination {
-    margin-top: 10px;
-    margin-bottom: 10px;
+.user-management__query {
+    max-width: 560px;
 }
 
-.n-data-table {
+.user-management__table {
+    overflow: auto;
+}
+
+.user-management__table .n-data-table {
     min-width: 800px;
 }
 </style>

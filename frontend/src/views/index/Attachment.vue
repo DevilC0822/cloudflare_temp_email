@@ -2,14 +2,17 @@
 import { ref, h, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { api } from '../../api'
-import { NPopconfirm } from 'naive-ui';
+import { NButton, NPopconfirm } from 'naive-ui';
 
 const message = useMessage()
 
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Attachments',
+            refresh: 'Refresh',
             download: 'Download',
             action: 'Action',
             delete: 'Delete',
@@ -17,6 +20,8 @@ const { t } = useI18n({
             deleteSuccess: 'Deleted successfully',
         },
         zh: {
+            title: '附件',
+            refresh: '刷新',
             download: '下载',
             action: '操作',
             delete: '删除',
@@ -121,6 +126,27 @@ onMounted(async () => {
                 {{ t('download') }}
             </n-button>
         </n-modal>
-        <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+
+        <AppSection :title="t('title')" :glass="false" class="attachment-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+            </template>
+
+            <div class="attachment-table">
+                <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+            </div>
+        </AppSection>
     </div>
 </template>
+
+<style scoped>
+.attachment-table {
+    overflow: auto;
+}
+
+.attachment-table .n-data-table {
+    min-width: 720px;
+}
+</style>

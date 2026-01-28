@@ -37,12 +37,12 @@ onMounted(async () => {
 </script>
 
 <template>
-    <section class="user-bar">
-        <div v-if="!userSettings.fetched" class="userbar-card app-glass">
+    <section class="app-page">
+        <div v-if="!userSettings.fetched" class="app-panel app-glass">
             <n-skeleton style="height: 36vh" />
         </div>
 
-        <div v-else-if="userSettings.user_email" class="userbar-card app-glass userbar-success">
+        <div v-else-if="userSettings.user_email" class="app-panel app-glass userbar-success">
             <n-space align="center" justify="space-between" :wrap="true">
                 <div class="userbar-title">
                     {{ t('currentUser') }}
@@ -53,7 +53,7 @@ onMounted(async () => {
             </n-space>
         </div>
 
-        <div v-else class="center">
+        <div v-else class="app-center">
             <div class="login-card app-glass">
                 <n-alert v-if="userJwt" type="warning" :show-icon="false" :bordered="false" closable>
                     <span>{{ t('fetchUserSettingsError') }}</span>
@@ -65,23 +65,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.user-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
-}
-
-.userbar-card {
-    padding: 12px;
-}
-
 .login-card {
     width: min(680px, 100%);
     padding: 14px;

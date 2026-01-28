@@ -4,6 +4,8 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeUnmount, ref, shallowRef } from 'vue'
 import { useSessionStorage } from '@vueuse/core'
+
+import AppSection from '../../components/AppSection.vue'
 import { api } from '../../api'
 
 const message = useMessage()
@@ -24,14 +26,19 @@ const { t } = useI18n({
     locale: 'zh',
     messages: {
         en: {
+            title: 'Send Mail',
             successSend: 'Please check your sendbox. If failed, please try again later.',
-            fromName: 'Your Name and Address, leave Name blank to use email address',
-            toName: 'Recipient Name and Address, leave Name blank to use email address',
+            fromName: 'From',
+            fromNamePlaceholder: 'Name (optional)',
+            fromMailPlaceholder: 'Email address',
+            toName: 'To',
+            toNamePlaceholder: 'Name (optional)',
+            toMailPlaceholder: 'Email address',
             subject: 'Subject',
-            options: 'Options',
+            options: 'Format',
             edit: 'Edit',
             preview: 'Preview',
-            content: 'Content',
+            content: 'Body',
             send: 'Send',
             text: 'Text',
             html: 'HTML',
@@ -39,11 +46,16 @@ const { t } = useI18n({
             tooLarge: 'Too large file, please upload file less than 1MB.',
         },
         zh: {
+            title: '发送邮件',
             successSend: '请查看您的发件箱, 如果失败, 请检查稍后重试。',
-            fromName: '你的名称和地址，名称不填写则使用邮箱地址',
-            toName: '收件人名称和地址，名称不填写则使用邮箱地址',
+            fromName: '发件人',
+            fromNamePlaceholder: '名称（可选）',
+            fromMailPlaceholder: '发件地址',
+            toName: '收件人',
+            toNamePlaceholder: '名称（可选）',
+            toMailPlaceholder: '收件地址',
             subject: '主题',
-            options: '选项',
+            options: '格式',
             edit: '编辑',
             preview: '预览',
             content: '内容',
@@ -87,10 +99,9 @@ const send = async () => {
             contentType: 'text',
             content: "",
         }
+        message.success(t("successSend"));
     } catch (error) {
         message.error(error.message || "error");
-    } finally {
-        message.success(t("successSend"));
     }
 }
 
@@ -122,78 +133,88 @@ const handleCreated = (editor) => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded>
-            <n-flex justify="end">
-                <n-button type="primary" @click="send">{{ t('send') }}</n-button>
-            </n-flex>
-            <div class="left">
+    <div class="app-center">
+        <AppSection :title="t('title')" :glass="false" class="admin-sendmail">
+            <template #actions>
+                <n-button type="primary" size="small" @click="send">
+                    {{ t('send') }}
+                </n-button>
+            </template>
+
+            <div class="sendmail-form">
                 <n-form :model="sendMailModel">
                     <n-form-item :label="t('fromName')" label-placement="top">
                         <n-input-group>
-                            <n-input v-model:value="sendMailModel.fromName" />
-                            <n-input v-model:value="sendMailModel.fromMail" />
+                            <n-input v-model:value="sendMailModel.fromName" :placeholder="t('fromNamePlaceholder')" />
+                            <n-input v-model:value="sendMailModel.fromMail" :placeholder="t('fromMailPlaceholder')" />
                         </n-input-group>
                     </n-form-item>
                     <n-form-item :label="t('toName')" label-placement="top">
                         <n-input-group>
-                            <n-input v-model:value="sendMailModel.toName" />
-                            <n-input v-model:value="sendMailModel.toMail" />
+                            <n-input v-model:value="sendMailModel.toName" :placeholder="t('toNamePlaceholder')" />
+                            <n-input v-model:value="sendMailModel.toMail" :placeholder="t('toMailPlaceholder')" />
                         </n-input-group>
                     </n-form-item>
                     <n-form-item :label="t('subject')" label-placement="top">
                         <n-input v-model:value="sendMailModel.subject" />
                     </n-form-item>
                     <n-form-item :label="t('options')" label-placement="top">
-                        <n-radio-group v-model:value="sendMailModel.contentType">
-                            <n-radio-button v-for="option in contentTypes" :key="option.value" :value="option.value"
-                                :label="option.label" />
-                        </n-radio-group>
-                        <n-button v-if="sendMailModel.contentType != 'text'" @click="isPreview = !isPreview"
-                            style="margin-left: 10px;">
-                            {{ isPreview ? t('edit') : t('preview') }}
-                        </n-button>
+                        <n-flex align="center" justify="space-between" class="sendmail-options">
+                            <n-radio-group v-model:value="sendMailModel.contentType">
+                                <n-radio-button v-for="option in contentTypes" :key="option.value"
+                                    :value="option.value" :label="option.label" />
+                            </n-radio-group>
+                            <n-button v-if="sendMailModel.contentType != 'text'" @click="isPreview = !isPreview"
+                                tertiary size="small">
+                                {{ isPreview ? t('edit') : t('preview') }}
+                            </n-button>
+                        </n-flex>
                     </n-form-item>
                     <n-form-item :label="t('content')" label-placement="top">
-                        <n-card :bordered="false" embedded v-if="isPreview">
-                            <div v-html="sendMailModel.content" />
-                        </n-card>
-                        <div v-else-if="sendMailModel.contentType == 'rich'" style="border: 1px solid #ccc">
-                            <Toolbar style="border-bottom: 1px solid #ccc" :defaultConfig="toolbarConfig"
-                                :editor="editorRef" mode="default" />
+                        <div v-if="isPreview" class="sendmail-preview" v-html="sendMailModel.content" />
+                        <div v-else-if="sendMailModel.contentType == 'rich'" class="sendmail-rich-editor">
+                            <Toolbar class="sendmail-rich-toolbar" :defaultConfig="toolbarConfig" :editor="editorRef"
+                                mode="default" />
                             <Editor style="height: 500px; overflow-y: hidden;" v-model="sendMailModel.content"
                                 :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated" />
                         </div>
-                        <n-input v-else type="textarea" v-model:value="sendMailModel.content" :autosize="{
-                            minRows: 3
-                        }" />
+                        <n-input v-else type="textarea" v-model:value="sendMailModel.content" :autosize="{ minRows: 3 }" />
                     </n-form-item>
                 </n-form>
             </div>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-card {
-    max-width: 800px;
+.admin-sendmail {
+    width: min(960px, 100%);
 }
 
-.n-button {
+.sendmail-form {
     text-align: left;
-    margin-right: 10px;
 }
 
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
+.sendmail-options {
+    width: 100%;
 }
 
-.left {
-    text-align: left;
-    place-items: left;
-    justify-content: left;
+.sendmail-preview {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    background: var(--app-surface-subtle);
+    overflow: auto;
+}
+
+.sendmail-rich-editor {
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+    overflow: hidden;
+}
+
+.sendmail-rich-toolbar {
+    border-bottom: 1px solid var(--app-border);
 }
 </style>

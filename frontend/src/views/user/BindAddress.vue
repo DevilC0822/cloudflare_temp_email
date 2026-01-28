@@ -1,45 +1,22 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import Login from '../common/Login.vue'
 
-const { userJwt, userSettings, } = useGlobalState()
-
-const { t } = useI18n({
-    messages: {
-        en: {
-            logout: 'Logout',
-        },
-        zh: {
-            logout: '退出登录',
-        }
-    }
-});
-
-const fetchData = async () => {
-}
-
-onMounted(async () => {
-    await fetchData()
-})
+const { userSettings } = useGlobalState()
 </script>
 
 <template>
-    <div class="center" v-if="userSettings.user_email">
-        <n-card :bordered="false" embedded style="max-width: 600px;">
+    <div class="app-center" v-if="userSettings.user_email">
+        <AppSection title="绑定地址" :glass="false" class="bind-address-section">
             <Login />
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    text-align: center;
-    place-items: center;
-    justify-content: center;
+.bind-address-section {
+    width: min(720px, 100%);
+    text-align: left;
 }
 </style>

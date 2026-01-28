@@ -24,5 +24,5 @@ const testSettings = async (webhookSettings: any) => {
 </script>
 
 <template>
-    <WebhookComponent :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings" />
+    <WebhookComponent title="Webhook" :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings" />
 </template>

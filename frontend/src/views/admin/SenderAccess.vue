@@ -2,6 +2,7 @@
 import { ref, h, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -11,6 +12,7 @@ const message = useMessage()
 const { t } = useI18n({
   messages: {
     en: {
+      title: 'Sender Access',
       address: 'Address',
       success: 'Success',
       is_enabled: 'Is Enabled',
@@ -25,9 +27,11 @@ const { t } = useI18n({
       modalTip: 'Please input the sender balance',
       balance: 'Balance',
       query: 'Query',
+      refresh: 'Refresh',
       ok: 'OK'
     },
     zh: {
+      title: '发件权限',
       address: '地址',
       success: '成功',
       is_enabled: '是否启用',
@@ -42,6 +46,7 @@ const { t } = useI18n({
       modalTip: '请输入发件额度',
       balance: '余额',
       query: '查询',
+      refresh: '刷新',
       ok: '确定'
     }
   }
@@ -174,41 +179,50 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <n-modal v-model:show="showModal" preset="dialog">
-      <p>{{ curRow.address }}</p>
-      <p>{{ t('modalTip') }}</p>
-      <n-form-item :show-label="false">
-        <n-checkbox v-model:checked="senderEnabled">
-          {{ t('enable') }}
-        </n-checkbox>
-      </n-form-item>
-      <n-form-item :show-label="false">
-        <n-input-number v-model:value="senderBalance" :min="0" :max="1000" />
-      </n-form-item>
-      <template #action>
-        <n-button :loading="loading" @click="updateData()" size="small" tertiary type="primary">
-          {{ t('ok') }}
+  <div class="app-center">
+    <AppSection :title="t('title')" :glass="false" class="sender-access-section">
+      <template #actions>
+        <n-button tertiary @click="fetchData" :loading="loading">
+          {{ t('refresh') }}
         </n-button>
       </template>
-    </n-modal>
-    <n-input-group>
-      <n-input v-model:value="addressQuery" @keydown.enter="fetchData" />
-      <n-button @click="fetchData" type="primary" tertiary>
-        {{ t('query') }}
-      </n-button>
-    </n-input-group>
-    <div style="overflow: auto;">
-      <div style="display: inline-block;">
+
+      <n-modal v-model:show="showModal" preset="dialog">
+        <p>{{ curRow.address }}</p>
+        <p>{{ t('modalTip') }}</p>
+        <n-form-item :show-label="false">
+          <n-checkbox v-model:checked="senderEnabled">
+            {{ t('enable') }}
+          </n-checkbox>
+        </n-form-item>
+        <n-form-item :show-label="false">
+          <n-input-number v-model:value="senderBalance" :min="0" :max="1000" />
+        </n-form-item>
+        <template #action>
+          <n-button :loading="loading" @click="updateData()" size="small" tertiary type="primary">
+            {{ t('ok') }}
+          </n-button>
+        </template>
+      </n-modal>
+
+      <n-input-group class="sender-access-query">
+        <n-input v-model:value="addressQuery" @keydown.enter="fetchData" />
+        <n-button @click="fetchData" type="primary" tertiary>
+          {{ t('query') }}
+        </n-button>
+      </n-input-group>
+
+      <div class="sender-access-table">
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" :page-sizes="[20, 50, 100]"
           show-size-picker>
           <template #prefix="{ itemCount }">
             {{ t('itemCount') }}: {{ itemCount }}
           </template>
         </n-pagination>
+
+        <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
       </div>
-      <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
-    </div>
+    </AppSection>
   </div>
 </template>
 
@@ -220,5 +234,17 @@ onMounted(async () => {
 
 .n-data-table {
   min-width: 700px;
+}
+
+.sender-access-section {
+  width: min(1120px, 100%);
+}
+
+.sender-access-query {
+  margin-bottom: 10px;
+}
+
+.sender-access-table {
+  overflow: auto;
 }
 </style>

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 import { hashPassword } from '../../utils'
@@ -24,14 +25,15 @@ const confirmPassword = ref('')
 const { locale, t } = useI18n({
     messages: {
         en: {
+            title: 'Account Settings',
             logout: "Logout",
             deleteAccount: "Delete Account",
-            showAddressCredential: 'Show Address Credential',
+            showAddressCredential: 'Credential',
             logoutConfirm: 'Are you sure to logout?',
             deleteAccount: "Delete Account",
             deleteAccountConfirm: "Are you sure to delete your account and all emails for this account?",
             clearInbox: "Clear Inbox",
-            clearSentItems: "Clear Sent Items",
+            clearSentItems: "Clear Outbox",
             clearInboxConfirm: "Are you sure to clear all emails in your inbox?",
             clearSentItemsConfirm: "Are you sure to clear all emails in your sent items?",
             success: "Success",
@@ -42,14 +44,15 @@ const { locale, t } = useI18n({
             passwordChanged: "Password changed successfully",
         },
         zh: {
-            logout: '退出登录',
+            title: '账号设置',
+            logout: '退出',
             deleteAccount: "删除账户",
-            showAddressCredential: '查看邮箱地址凭证',
+            showAddressCredential: '查看凭证',
             logoutConfirm: '确定要退出登录吗？',
             deleteAccount: "删除账户",
             deleteAccountConfirm: "确定要删除你的账户和其中的所有邮件吗?",
-            clearInbox: "清空收件箱",
-            clearSentItems: "清空发件箱",
+            clearInbox: "清空收件",
+            clearSentItems: "清空发件",
             clearInboxConfirm: "确定要清空你收件箱中的所有邮件吗？",
             clearSentItemsConfirm: "确定要清空你发件箱中的所有邮件吗？",
             success: "成功",
@@ -130,30 +133,33 @@ const changePassword = async () => {
 </script>
 
 <template>
-    <div class="center" v-if="settings.address">
-        <n-card :bordered="false" embedded>
-            <n-button @click="showAddressCredential = true" type="primary" secondary block strong>
-                {{ t('showAddressCredential') }}
-            </n-button>
-            <n-button v-if="openSettings?.enableAddressPassword" @click="showChangePassword = true" type="info" secondary block strong>
-                {{ t('changePassword') }}
-            </n-button>
-            <n-button v-if="openSettings.enableUserDeleteEmail" @click="showClearInbox = true" type="warning" secondary
-                block strong>
-                {{ t('clearInbox') }}
-            </n-button>
-            <n-button v-if="openSettings.enableUserDeleteEmail" @click="showClearSentItems = true" type="warning"
-                secondary block strong>
-                {{ t('clearSentItems') }}
-            </n-button>
-            <n-button @click="showLogout = true" secondary block strong>
-                {{ t('logout') }}
-            </n-button>
-            <n-button v-if="openSettings.enableUserDeleteEmail" @click="showDeleteAccount = true" type="error" secondary
-                block strong>
-                {{ t('deleteAccount') }}
-            </n-button>
-        </n-card>
+    <div class="app-center" v-if="settings.address">
+        <AppSection :title="t('title')" :glass="false" class="account-settings-section">
+            <n-space vertical size="small">
+                <n-button @click="showAddressCredential = true" type="primary" secondary block strong>
+                    {{ t('showAddressCredential') }}
+                </n-button>
+                <n-button v-if="openSettings?.enableAddressPassword" @click="showChangePassword = true" type="info"
+                    secondary block strong>
+                    {{ t('changePassword') }}
+                </n-button>
+                <n-button v-if="openSettings.enableUserDeleteEmail" @click="showClearInbox = true" type="warning"
+                    secondary block strong>
+                    {{ t('clearInbox') }}
+                </n-button>
+                <n-button v-if="openSettings.enableUserDeleteEmail" @click="showClearSentItems = true" type="warning"
+                    secondary block strong>
+                    {{ t('clearSentItems') }}
+                </n-button>
+                <n-button @click="showLogout = true" secondary block strong>
+                    {{ t('logout') }}
+                </n-button>
+                <n-button v-if="openSettings.enableUserDeleteEmail" @click="showDeleteAccount = true" type="error"
+                    secondary block strong>
+                    {{ t('deleteAccount') }}
+                </n-button>
+            </n-space>
+        </AppSection>
         <n-modal v-model:show="showLogout" preset="dialog" :title="t('logout')">
             <p>{{ t('logoutConfirm') }}</p>
             <template #action>
@@ -206,18 +212,8 @@ const changePassword = async () => {
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    justify-content: center;
-}
-
-
-.n-card {
-    max-width: 800px;
+.account-settings-section {
+    width: min(900px, 100%);
     text-align: left;
-}
-
-.n-button {
-    margin-top: 10px;
 }
 </style>

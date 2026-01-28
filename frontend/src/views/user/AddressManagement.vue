@@ -4,19 +4,22 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router';
 import { NBadge, NPopconfirm, NButton } from 'naive-ui'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 import { getRouterPathWithLang } from '../../utils'
 
 import Login from '../common/Login.vue';
 
-const { jwt } = useGlobalState()
+const { jwt, loading } = useGlobalState()
 const message = useMessage()
 const router = useRouter()
 
 const { locale, t } = useI18n({
     messages: {
         en: {
+            title: 'Address Management',
+            refresh: 'Refresh',
             success: 'success',
             name: 'Name',
             mail_count: 'Mail Count',
@@ -32,6 +35,8 @@ const { locale, t } = useI18n({
             create_or_bind: 'Create or Bind',
         },
         zh: {
+            title: '地址管理',
+            refresh: '刷新',
             success: '成功',
             name: '名称',
             mail_count: '邮件数量',
@@ -160,7 +165,7 @@ const columns = [
         title: t('actions'),
         key: 'actions',
         render(row) {
-            return h('div', [
+            return h('div', { style: 'display:flex; gap:8px; flex-wrap:wrap;' }, [
                 h(NPopconfirm,
                     {
                         onPositiveClick: () => changeMailAddress(row.id)
@@ -227,21 +232,37 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-        <n-tabs type="segment">
-            <n-tab-pane name="address" :tab="t('address')">
-                <div style="overflow: auto;">
-                    <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
-                </div>
-            </n-tab-pane>
-            <n-tab-pane name="create_or_bind" :tab="t('create_or_bind')">
-                <Login />
-            </n-tab-pane>
-        </n-tabs>
+        <AppSection :title="t('title')" :glass="false" class="address-management-section">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+            </template>
+
+            <n-tabs type="segment" class="address-management-tabs">
+                <n-tab-pane name="address" :tab="t('address')">
+                    <div class="address-management-table">
+                        <n-data-table :columns="columns" :data="data" :bordered="false" embedded />
+                    </div>
+                </n-tab-pane>
+                <n-tab-pane name="create_or_bind" :tab="t('create_or_bind')">
+                    <Login />
+                </n-tab-pane>
+            </n-tabs>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.n-data-table {
+.address-management-tabs {
+    margin-top: 8px;
+}
+
+.address-management-table {
+    overflow: auto;
+}
+
+.address-management-table .n-data-table {
     min-width: 700px;
 }
 </style>

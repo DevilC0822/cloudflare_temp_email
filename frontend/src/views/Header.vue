@@ -60,6 +60,7 @@ const { locale, t } = useI18n({
             subtitle: 'Private, fast, and temporary inbox',
             dark: 'Dark',
             light: 'Light',
+            skipToContent: 'Skip to content',
             accessHeader: 'Access Password',
             accessTip: 'Please enter the correct access password',
             home: 'Home',
@@ -75,6 +76,7 @@ const { locale, t } = useI18n({
             subtitle: '简洁、安全的临时邮箱',
             dark: '暗色',
             light: '亮色',
+            skipToContent: '跳到内容',
             accessHeader: '访问密码',
             accessTip: '请输入站点访问密码',
             home: '主页',
@@ -241,6 +243,9 @@ onMounted(async () => {
 </script>
 
 <template>
+    <a class="app-skip-link" href="#main-content">
+        {{ t('skipToContent') }}
+    </a>
     <header class="app-header">
         <div class="app-container">
             <div class="header-card app-glass">

@@ -2,7 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import AppSection from './AppSection.vue'
+
 const props = defineProps({
+    title: {
+        type: String,
+        default: ''
+    },
+    glass: {
+        type: Boolean,
+        default: false
+    },
     fetchData: {
         type: Function,
         default: () => { },
@@ -26,9 +36,11 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Webhook',
             successTip: 'Success',
             test: 'Test',
             save: 'Save',
+            refresh: 'Refresh',
             notEnabled: 'Webhook is not enabled for you',
             urlMissing: 'URL is required',
             enable: 'Enable',
@@ -37,9 +49,11 @@ const { t } = useI18n({
             fillInDemoTip: 'Please modify the URL and other settings to your own',
         },
         zh: {
+            title: 'Webhook',
             successTip: '成功',
             test: '测试',
             save: '保存',
+            refresh: '刷新',
             notEnabled: 'Webhook 未开启，请联系管理员开启',
             urlMissing: 'URL 不能为空',
             enable: '启用',
@@ -125,33 +139,38 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded v-if="enableWebhook" style="max-width: 800px; overflow: auto;">
-            <n-flex justify="end">
-                <n-button tag="a" :href="messagePusherDocLink" target="_blank" secondary>
+    <div v-if="enableWebhook" class="app-center">
+        <AppSection :title="props.title || t('title')" :glass="glass" class="webhook-component">
+            <template #actions>
+                <n-button size="small" tertiary @click="fetchData">
+                    {{ t('refresh') }}
+                </n-button>
+                <n-button size="small" tertiary tag="a" :href="messagePusherDocLink" target="_blank">
                     {{ t('messagePusherDoc') }}
                 </n-button>
-                <n-button @click="fillMessagePuhserDemo" secondary>
+                <n-button size="small" tertiary @click="fillMessagePuhserDemo">
                     {{ t('messagePusherDemo') }}
                 </n-button>
-                <n-button v-if="webhookSettings.enabled" @click="testSettings" secondary>
+                <n-button size="small" tertiary v-if="webhookSettings.enabled" @click="testSettings">
                     {{ t('test') }}
                 </n-button>
-                <n-button @click="saveSettings" type="primary">
+                <n-button size="small" type="primary" @click="saveSettings">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
+            </template>
+
             <n-form-item-row :label="t('enable')">
                 <n-switch v-model:value="webhookSettings.enabled" :round="false" />
             </n-form-item-row>
+
             <div v-if="webhookSettings.enabled">
                 <n-form-item-row label="URL">
                     <n-input v-model:value="webhookSettings.url" />
                 </n-form-item-row>
                 <n-form-item-row label="METHOD">
-                    <n-select v-model:value="webhookSettings.method" tag :options='[
-                        { label: "POST", value: "POST" }
-                    ]' />
+                    <n-select v-model:value="webhookSettings.method" tag :options="[
+                        { label: 'POST', value: 'POST' },
+                    ]" />
                 </n-form-item-row>
                 <n-form-item-row label="HEADERS">
                     <n-input v-model:value="webhookSettings.headers" type="textarea" :autosize="{ minRows: 3 }" />
@@ -160,20 +179,16 @@ onMounted(async () => {
                     <n-input v-model:value="webhookSettings.body" type="textarea" :autosize="{ minRows: 3 }" />
                 </n-form-item-row>
             </div>
-        </n-card>
-        <n-result v-else status="404" :title="t('notEnabled')" />
+        </AppSection>
+    </div>
+
+    <div v-else class="app-center">
+        <n-result status="404" :title="t('notEnabled')" />
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    text-align: left;
-    place-items: center;
-    justify-content: center;
-}
-
-.n-button {
-    margin-top: 10px;
+.webhook-component {
+    width: min(900px, 100%);
 }
 </style>

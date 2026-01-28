@@ -1,5 +1,7 @@
 <script setup>
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useGlobalState } from '../store'
 
@@ -13,19 +15,44 @@ const {
     userTab, globalTabplacement, userSettings
 } = useGlobalState()
 
+const route = useRoute()
+const router = useRouter()
+
+const userTabType = computed(() => {
+    const placement = globalTabplacement.value;
+    return placement === 'top' || placement === 'bottom' ? 'segment' : 'bar';
+});
+
+const syncUserTabFromRoute = () => {
+    const tab = route.query.tab;
+    if (typeof tab !== 'string') return;
+    const available = new Set(['address_management', 'user_mail_box_tab', 'user_settings', 'bind_address']);
+    if (available.has(tab)) userTab.value = tab;
+};
+
+watch(() => route.query.tab, () => {
+    syncUserTabFromRoute();
+}, { immediate: true });
+
+watch(userTab, async (tab) => {
+    if (!tab) return;
+    if (route.query.tab === tab) return;
+    await router.replace({ query: { ...route.query, tab } });
+});
+
 const { t } = useI18n({
     messages: {
         en: {
-            address_management: 'Address Management',
-            user_mail_box_tab: 'Mail Box',
-            user_settings: 'User Settings',
-            bind_address: 'Bind Mail Address',
+            address_management: 'Addresses',
+            user_mail_box_tab: 'Inbox',
+            user_settings: 'Security',
+            bind_address: 'Bind',
         },
         zh: {
-            address_management: '地址管理',
-            user_mail_box_tab: '收件箱',
-            user_settings: '用户设置',
-            bind_address: '绑定邮箱地址',
+            address_management: '地址',
+            user_mail_box_tab: '收件',
+            user_settings: '安全',
+            bind_address: '绑定',
         }
     }
 });
@@ -33,10 +60,10 @@ const { t } = useI18n({
 </script>
 
 <template>
-    <section class="user-page">
+    <section class="app-page">
         <UserBar />
-        <div v-if="userSettings.user_email" class="user-panel app-glass">
-            <n-tabs type="card" v-model:value="userTab" :placement="globalTabplacement">
+        <div v-if="userSettings.user_email" class="app-panel app-glass">
+            <n-tabs :type="userTabType" v-model:value="userTab" :placement="globalTabplacement" animated>
                 <n-tab-pane name="address_management" :tab="t('address_management')">
                     <AddressMangement />
                 </n-tab-pane>
@@ -55,13 +82,4 @@ const { t } = useI18n({
 </template>
 
 <style scoped>
-.user-page {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.user-panel {
-    padding: 12px;
-}
 </style>

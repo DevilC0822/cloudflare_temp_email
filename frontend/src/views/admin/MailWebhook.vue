@@ -26,5 +26,6 @@ const testSettings = async (webhookSettings: any) => {
 </script>
 
 <template>
-    <WebhookComponent :fetchData="fetchData" :saveSettings="saveSettings" :testSettings="testSettings" />
+    <WebhookComponent title="邮件 Webhook" :fetchData="fetchData" :saveSettings="saveSettings"
+        :testSettings="testSettings" />
 </template>

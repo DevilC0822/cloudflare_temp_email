@@ -142,7 +142,7 @@ const { t } = useI18n({
     en: {
       success: 'Success',
       autoRefresh: 'Auto Refresh',
-      refreshAfter: 'Refresh After {msg} Seconds',
+      refreshAfter: 'Auto {msg}s',
       refresh: 'Refresh',
       attachments: 'Show Attachments',
       downloadMail: 'Download Mail',
@@ -154,19 +154,19 @@ const { t } = useI18n({
       showTextMail: 'Show Text Mail',
       showHtmlMail: 'Show Html Mail',
       saveToS3: 'Save to S3',
-      multiAction: 'Multi Action',
-      cancelMultiAction: 'Cancel Multi Action',
-      selectAll: 'Select All of This Page',
-      unselectAll: 'Unselect All',
-      prevMail: 'Previous',
+      multiAction: 'Batch',
+      cancelMultiAction: 'Exit Batch',
+      selectAll: 'Select Page',
+      unselectAll: 'Clear',
+      prevMail: 'Prev',
       nextMail: 'Next',
-      keywordQueryTip: 'Filter current page',
+      keywordQueryTip: 'Filter this page',
       query: 'Query',
     },
     zh: {
       success: '成功',
       autoRefresh: '自动刷新',
-      refreshAfter: '{msg}秒后刷新',
+      refreshAfter: '自动 {msg}s',
       refresh: '刷新',
       downloadMail: '下载邮件',
       attachments: '查看附件',
@@ -178,13 +178,13 @@ const { t } = useI18n({
       showTextMail: '显示纯文本邮件',
       showHtmlMail: '显示HTML邮件',
       saveToS3: '保存到S3',
-      multiAction: '多选',
-      cancelMultiAction: '取消多选',
+      multiAction: '批量',
+      cancelMultiAction: '退出批量',
       selectAll: '全选本页',
-      unselectAll: '取消全选',
+      unselectAll: '清空',
       prevMail: '上一封',
       nextMail: '下一封',
-      keywordQueryTip: '过滤当前页',
+      keywordQueryTip: '本页筛选',
       query: '查询',
     }
   }
@@ -400,7 +400,7 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <div v-if="!isMobile" class="left">
-      <div style="margin-bottom: 10px;">
+      <div class="mail-toolbar">
         <n-space v-if="multiActionMode" align="center">
           <n-button @click="multiActionModeClick(false)" tertiary>
             {{ t('cancelMultiAction') }}
@@ -442,8 +442,7 @@ onBeforeUnmount(() => {
             {{ t('refresh') }}
           </n-button>
           <n-input v-if="showFilterInput" v-model:value="localFilterKeyword"
-            :placeholder="t('keywordQueryTip')" style="width: 200px; display: flex; align-items: center;"
-            clearable />
+            :placeholder="t('keywordQueryTip')" class="mail-filter-input" clearable />
         </n-space>
       </div>
       <n-split class="left" direction="horizontal" :max="0.75" :min="0.25" :default-size="mailboxSplitSize"
@@ -458,22 +457,14 @@ onBeforeUnmount(() => {
                 </template>
                 <n-thing :title="row.subject">
                   <template #description>
-                    <n-tag type="info">
-                      ID: {{ row.id }}
-                    </n-tag>
-                    <n-tag type="info">
-                      {{ utcToLocalDate(row.created_at, useUTCDate) }}
-                    </n-tag>
-                    <n-tag type="info">
-                      <n-ellipsis style="max-width: 240px;">
-                        {{ showEMailTo ? "FROM: " + row.source : row.source }}
+                    <n-text depth="3" class="mail-meta">
+                      #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+                    </n-text>
+                    <n-text depth="3" class="mail-meta">
+                      <n-ellipsis style="max-width: 520px;">
+                        {{ showEMailTo ? (row.source + " → " + row.address) : row.source }}
                       </n-ellipsis>
-                    </n-tag>
-                    <n-tag v-if="showEMailTo" type="info">
-                      <n-ellipsis style="max-width: 240px;">
-                        TO: {{ row.address }}
-                      </n-ellipsis>
-                    </n-tag>
+                    </n-text>
                     <AiExtractInfo :metadata="row.metadata" compact />
                   </template>
                 </n-thing>
@@ -515,7 +506,7 @@ onBeforeUnmount(() => {
       </n-split>
     </div>
     <div class="left" v-else>
-      <n-space justify="space-around" align="center" :wrap="false" style="display: flex; align-items: center;">
+      <n-space justify="space-around" align="center" :wrap="false" class="mail-toolbar-mobile">
         <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
         <n-switch v-model:value="autoRefresh" size="small" :round="false">
           <template #checked>
@@ -529,7 +520,7 @@ onBeforeUnmount(() => {
           {{ t('refresh') }}
         </n-button>
       </n-space>
-      <div v-if="showFilterInput" style="padding: 0 10px; margin-top: 8px; margin-bottom: 10px;">
+      <div v-if="showFilterInput" class="mail-filter-mobile">
         <n-input v-model:value="localFilterKeyword"
           :placeholder="t('keywordQueryTip')" size="small" clearable />
       </div>
@@ -538,22 +529,14 @@ onBeforeUnmount(() => {
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
             <n-thing :title="row.subject">
               <template #description>
-                <n-tag type="info">
-                  ID: {{ row.id }}
-                </n-tag>
-                <n-tag type="info">
-                  {{ utcToLocalDate(row.created_at, useUTCDate) }}
-                </n-tag>
-                <n-tag type="info">
-                  <n-ellipsis style="max-width: 240px;">
-                    {{ showEMailTo ? "FROM: " + row.source : row.source }}
+                <n-text depth="3" class="mail-meta">
+                  #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+                </n-text>
+                <n-text depth="3" class="mail-meta">
+                  <n-ellipsis style="max-width: 520px;">
+                    {{ showEMailTo ? (row.source + " → " + row.address) : row.source }}
                   </n-ellipsis>
-                </n-tag>
-                <n-tag v-if="showEMailTo" type="info">
-                  <n-ellipsis style="max-width: 240px;">
-                    TO: {{ row.address }}
-                  </n-ellipsis>
-                </n-tag>
+                </n-text>
                 <AiExtractInfo :metadata="row.metadata" compact />
               </template>
             </n-thing>
@@ -614,6 +597,32 @@ onBeforeUnmount(() => {
   max-height: calc(100vh - 240px);
   padding: 2px;
   border-radius: var(--app-radius);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
+}
+
+.mail-toolbar {
+  margin-bottom: 10px;
+}
+
+.mail-toolbar-mobile {
+  display: flex;
+  align-items: center;
+}
+
+.mail-filter-input {
+  width: 220px;
+}
+
+.mail-filter-mobile {
+  padding: 0 10px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.mail-meta {
+  display: block;
+  line-height: 1.3;
 }
 
 .mail-list-scroll--mobile {

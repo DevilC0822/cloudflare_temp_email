@@ -3,6 +3,7 @@ import { onMounted, ref, h } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { NButton, NPopconfirm, NInput, NSelect, NRadioGroup, NRadio } from 'naive-ui'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -14,6 +15,7 @@ const { t } = useI18n({
         en: {
             tip: 'You can manually input the following multiple select input and enter',
             manualInputPrompt: 'Type and press Enter to add',
+            title: 'Account Settings',
             save: 'Save',
             successTip: 'Save Success',
             address_block_list: 'Address Block Keywords for Users(Admin can skip)',
@@ -50,6 +52,7 @@ const { t } = useI18n({
         zh: {
             tip: '您可以手动输入以下多选输入框, 回车增加',
             manualInputPrompt: '输入后按回车键添加',
+            title: '账号设置',
             save: '保存',
             successTip: '保存成功',
             address_block_list: '邮件地址屏蔽关键词(管理员可跳过检查)',
@@ -290,16 +293,14 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
-        <n-card :bordered="false" embedded style="max-width: 600px;">
-            <n-alert :show-icon="false" :bordered="false" type="warning" style="margin-bottom: 10px;">
-                <span>{{ t("tip") }}</span>
-            </n-alert>
-            <n-flex justify="end">
+    <div class="app-center">
+        <AppSection :title="t('title')" :description="t('tip')" :glass="false" class="account-settings-section">
+            <template #actions>
                 <n-button @click="save" type="primary" :loading="loading">
                     {{ t('save') }}
                 </n-button>
-            </n-flex>
+            </template>
+
             <n-form-item-row :label="t('address_block_list')">
                 <n-select v-model:value="addressBlockList" filterable multiple tag
                     :placeholder="t('address_block_list_placeholder')">
@@ -355,7 +356,7 @@ onMounted(async () => {
             <n-form-item-row :label="t('email_forwarding_config')">
                 <n-button @click="openEmailForwardingModal">{{ t('config') }}</n-button>
             </n-form-item-row>
-        </n-card>
+        </AppSection>
     </div>
 
     <!-- 邮件转发配置弹窗 -->
@@ -379,11 +380,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    text-align: left;
-    place-items: center;
-    justify-content: center;
-    margin: 20px;
+.account-settings-section {
+    width: min(900px, 100%);
 }
 </style>

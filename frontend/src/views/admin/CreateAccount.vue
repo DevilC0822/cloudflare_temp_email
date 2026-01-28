@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
 import { useGlobalState } from '../../store'
 import { api } from '../../api'
 
@@ -16,6 +17,7 @@ const { t } = useI18n({
             address: 'Address',
             enablePrefix: 'If enable Prefix',
             creatNewEmail: 'Create New Email',
+            title: 'Create Address',
             fillInAllFields: 'Please fill in all fields',
             successTip: 'Success Created',
             addressCredential: 'Mail Address Credential',
@@ -27,6 +29,7 @@ const { t } = useI18n({
             address: '地址',
             enablePrefix: '是否启用前缀',
             creatNewEmail: '创建新邮箱',
+            title: '创建邮箱',
             fillInAllFields: '请填写完整信息',
             successTip: '创建成功',
             addressCredential: '邮箱地址凭证',
@@ -82,7 +85,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
+    <div class="app-center">
         <n-modal v-model:show="showReultModal" preset="dialog" :title="t('addressCredential')">
             <span>
                 <p>{{ t("addressCredentialTip") }}</p>
@@ -104,7 +107,14 @@ onMounted(async () => {
                 </n-collapse>
             </n-card>
         </n-modal>
-        <n-card :bordered="false" embedded style="max-width: 600px;">
+
+        <AppSection :title="t('title')" :glass="false" class="create-account-section">
+            <template #actions>
+                <n-button @click="newEmail" type="primary" :loading="loading">
+                    {{ t('creatNewEmail') }}
+                </n-button>
+            </template>
+
             <n-form-item-row v-if="openSettings.prefix" :label="t('enablePrefix')">
                 <n-switch v-model:value="enablePrefix" :round="false" />
             </n-form-item-row>
@@ -119,19 +129,12 @@ onMounted(async () => {
                         :options="openSettings.domains" />
                 </n-input-group>
             </n-form-item-row>
-            <n-button @click="newEmail" type="primary" block :loading="loading">
-                {{ t('creatNewEmail') }}
-            </n-button>
-        </n-card>
+        </AppSection>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
-    text-align: left;
-    place-items: center;
-    justify-content: center;
-    margin: 20px;
+.create-account-section {
+    width: min(900px, 100%);
 }
 </style>

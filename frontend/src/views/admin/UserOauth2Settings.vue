@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n'
 
+import AppSection from '../../components/AppSection.vue'
+
 // @ts-ignore
 import { useGlobalState } from '../../store'
 // @ts-ignore
@@ -16,6 +18,8 @@ const message = useMessage()
 const { t } = useI18n({
     messages: {
         en: {
+            title: 'Oauth2 Settings',
+            refresh: 'Refresh',
             save: 'Save',
             delete: 'Delete',
             successTip: 'Save Success',
@@ -33,6 +37,8 @@ const { t } = useI18n({
             tip: 'Third-party login will automatically use the user\'s email to register an account (the same email will be regarded as the same account), this account is the same as the registered account, and you can also set the password through the forget password',
         },
         zh: {
+            title: 'Oauth2 设置',
+            refresh: '刷新',
             save: '保存',
             delete: '删除',
             successTip: '保存成功',
@@ -148,7 +154,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="center">
+    <div>
         <n-modal v-model:show="showAddOauth2" preset="dialog" :title="t('addOauth2')">
             <n-form>
                 <n-form-item-row :label="t('name')" required>
@@ -169,32 +175,36 @@ onMounted(async () => {
                 </n-button>
             </template>
         </n-modal>
-        <n-card :bordered="false" embedded style="max-width: 600px;">
-            <n-alert :show-icon="false" :bordered="false" type="warning" closable style="margin-bottom: 10px;">
-                {{ t("tip") }}
-            </n-alert>
-            <n-flex justify="end">
-                <n-button @click="showAddOauth2 = true" secondary :loading="loading">
-                    {{ t('addOauth2') }}
-                </n-button>
-                <n-button @click="save" type="primary" :loading="loading">
-                    {{ t('save') }}
-                </n-button>
-            </n-flex>
-            <n-divider />
-            <n-collapse default-expanded-names="1" accordion :trigger-areas="['main', 'arrow']">
-                <n-collapse-item v-for="(item, index) in userOauth2Settings" :key="index" :title="item.name">
-                    <template #header-extra>
-                        <n-popconfirm @positive-click="userOauth2Settings.splice(index, 1)">
-                            <template #trigger>
-                                <n-button tertiary type="error">
-                                    {{ t('delete') }}
-                                </n-button>
-                            </template>
-                            {{ t('delete') }}
-                        </n-popconfirm>
-                    </template>
-                    <n-form :model="item">
+        <div class="app-center">
+            <AppSection :title="t('title')" :description="t('tip')" :glass="false" class="oauth2-section">
+                <template #actions>
+                    <n-button size="small" tertiary @click="fetchData">
+                        {{ t('refresh') }}
+                    </n-button>
+                    <n-button size="small" tertiary @click="showAddOauth2 = true" :loading="loading">
+                        {{ t('addOauth2') }}
+                    </n-button>
+                    <n-button size="small" type="primary" @click="save" :loading="loading">
+                        {{ t('save') }}
+                    </n-button>
+                </template>
+
+                <n-divider />
+
+                <n-collapse default-expanded-names="1" accordion :trigger-areas="['main', 'arrow']">
+                    <n-collapse-item v-for="(item, index) in userOauth2Settings" :key="index" :title="item.name">
+                        <template #header-extra>
+                            <n-popconfirm @positive-click="userOauth2Settings.splice(index, 1)">
+                                <template #trigger>
+                                    <n-button size="small" tertiary type="error">
+                                        {{ t('delete') }}
+                                    </n-button>
+                                </template>
+                                {{ t('delete') }}
+                            </n-popconfirm>
+                        </template>
+
+                        <n-form :model="item">
                         <n-form-item-row :label="t('name')" required>
                             <n-input v-model:value="item.name" />
                         </n-form-item-row>
@@ -265,15 +275,14 @@ onMounted(async () => {
                     </n-form>
                 </n-collapse-item>
             </n-collapse>
-        </n-card>
+            </AppSection>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.center {
-    display: flex;
+.oauth2-section {
+    width: min(900px, 100%);
     text-align: left;
-    place-items: center;
-    justify-content: center;
 }
 </style>
