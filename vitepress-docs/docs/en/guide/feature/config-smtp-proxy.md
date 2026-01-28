@@ -34,6 +34,10 @@ Modify the environment variables in docker-compose.yaml, note to choose the appr
 
 `proxy_url` is the URL address of the `worker`
 
+::: tip Image Note
+Images are not published under the new namespace. The example `ghcr.io/dreamhunter2333/...` points to the legacy registry. For long-term use, enable `build` and pin your own image version.
+:::
+
 ```yaml
 services:
   smtp_proxy_server:

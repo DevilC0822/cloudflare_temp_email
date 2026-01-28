@@ -34,6 +34,10 @@ docker-compose up -d
 
 `proxy_url` 为 `worker` 的 URL 地址
 
+::: tip 镜像说明
+目前不在新的命名空间发布镜像；示例中的 `ghcr.io/dreamhunter2333/...` 为历史镜像仓库。如需长期使用，建议启用 `build` 自行构建并固定版本。
+:::
+
 ```yaml
 services:
   smtp_proxy_server:

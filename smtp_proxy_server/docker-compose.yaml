@@ -1,3 +1,4 @@
+# 注意：当前不在新的命名空间发布镜像；如需长期使用，建议启用 build 自行构建并固定版本。
 services:
   smtp_proxy_server:
     image: ghcr.io/dreamhunter2333/cloudflare_temp_email/smtp_proxy_server:latest
