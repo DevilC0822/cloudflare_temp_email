@@ -16,7 +16,7 @@ Please choose one of the three deployment methods below:
 
 ## Upgrade Process
 
-First, confirm your current version, then visit the [Release page](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/) and [CHANGELOG page](https://github.com/dreamhunter2333/cloudflare_temp_email/blob/main/CHANGELOG.md) to find your current version.
+First, confirm your current version, then visit the [Release page](https://github.com/DevilC0822/cloudflare_temp_email/releases/) and [CHANGELOG page](https://github.com/DevilC0822/cloudflare_temp_email/blob/main/CHANGELOG.md) to find your current version.
 
 > [!WARNING] Warning
 > Pay attention to `Breaking Changes` which require `database SQL execution` or `configuration changes`.

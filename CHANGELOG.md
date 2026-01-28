@@ -336,10 +336,10 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - UI: 发件箱也采用左右分栏显示(类似收件箱)
 - `SMTP IMAP Proxy` 添加发件箱查看
 
-* feat: telegram bot TelegramSettings && webhook by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/244
-* fix build by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/245
-* feat: UI changes by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/247
-* feat: SMTP IMAP Proxy: add sendbox && UI: sendbox use split view by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/248
+* feat: telegram bot TelegramSettings && webhook by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/244
+* fix build by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/245
+* feat: UI changes by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/247
+* feat: SMTP IMAP Proxy: add sendbox && UI: sendbox use split view by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/248
 
 ## v0.4.2
 
@@ -347,17 +347,17 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - 修复 UI 界面文字错误, 界面增加版本号
 - 增加  telegram bot 文档 https://temp-mail-docs.awsl.uk/zh/guide/feature/telegram.html
 
-* fix: imap server by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/227
-* fix: Maintenance wrong label by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/229
-* feat: add version for frontend && backend by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/230
-* feat: add page functions proxy to make response faster by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/234
-* feat: add about page by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/235
-* feat: remove mailV1Alert && fix mobile showSideMargin by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/236
-* feat: telegram bot by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/238
-* fix: remove cleanup address due to many table need to be clean by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/240
-* feat: docs: Telegram Bot by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/241
-* fix: smtp_proxy: cannot decode 8bit && tg bot new random address by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/242
-* fix: smtp_proxy: update raise imap4.NoSuchMailbox by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/243
+* fix: imap server by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/227
+* fix: Maintenance wrong label by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/229
+* feat: add version for frontend && backend by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/230
+* feat: add page functions proxy to make response faster by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/234
+* feat: add about page by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/235
+* feat: remove mailV1Alert && fix mobile showSideMargin by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/236
+* feat: telegram bot by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/238
+* fix: remove cleanup address due to many table need to be clean by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/240
+* feat: docs: Telegram Bot by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/241
+* fix: smtp_proxy: cannot decode 8bit && tg bot new random address by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/242
+* fix: smtp_proxy: update raise imap4.NoSuchMailbox by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/243
 
 ### v0.4.1
 
@@ -366,16 +366,16 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - 添加 `IMAP proxy` 服务，支持 `IMAP` 查看邮件
 - UI 界面增加版本号显示
 
-* feat: use common function handleListQuery when query by page by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/220
-* fix: typos by @lwd-temp in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/221
-* fix: name max 30 && /external/api/send_mail not return result by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/222
-* fix: smtp_proxy_server support decode from mail charset by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/223
-* feat: add imap proxy server by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/225
-* feat: UI show version by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/226
+* feat: use common function handleListQuery when query by page by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/220
+* fix: typos by @lwd-temp in https://github.com/DevilC0822/cloudflare_temp_email/pull/221
+* fix: name max 30 && /external/api/send_mail not return result by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/222
+* fix: smtp_proxy_server support decode from mail charset by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/223
+* feat: add imap proxy server by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/225
+* feat: UI show version by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/226
 
 ### New Contributors
 
-* @lwd-temp made their first contribution in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/221
+* @lwd-temp made their first contribution in https://github.com/DevilC0822/cloudflare_temp_email/pull/221
 
 ## v0.4.0
 
@@ -405,14 +405,14 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - 修复删除地址时邮件未删除的BUG #213
 - UI 增加全局标签页位置配置, 侧边距配置
 
-* feat: update docs by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/204
-* feat: add Deploy to Cloudflare Workers button by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/205
-* feat: add Deploy to Cloudflare Workers docs by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/206
-* feat: add UserLogin by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/209
-* feat: admin search mailbox && fix generateName multi dot && user jwt exp in 30 days && UI globalTabplacement && useSideMargin by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/214
-* feat: UI check openSettings in Login page by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/215
-* feat: UI move AdminContact to common by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/217
-* feat: docs by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/218
+* feat: update docs by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/204
+* feat: add Deploy to Cloudflare Workers button by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/205
+* feat: add Deploy to Cloudflare Workers docs by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/206
+* feat: add UserLogin by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/209
+* feat: admin search mailbox && fix generateName multi dot && user jwt exp in 30 days && UI globalTabplacement && useSideMargin by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/214
+* feat: UI check openSettings in Login page by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/215
+* feat: UI move AdminContact to common by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/217
+* feat: docs by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/218
 
 ## v0.3.3
 
@@ -430,9 +430,9 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - 添加定时清理功能，可在 admin 页面配置（需要在配置文件启用定时任务）
 - 修复删除账户无反应的问题
 
-* feat: UI: MailBox add reply button by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/187
-* feat: add cron auto clean up by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/189
-* fix: delete account by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/190
+* feat: UI: MailBox add reply button by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/187
+* feat: add cron auto clean up by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/189
+* fix: delete account by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/190
 
 ## v0.3.1
 
@@ -452,15 +452,15 @@ worker 配置文件新增 `DEFAULT_DOMAINS`, `USER_ROLES`, `USER_DEFAULT_ROLE`, 
 - UI 允许用户切换邮件展示模式 `v-html` / `iframe`
 - 添加 `admin` 账户配置页面，支持配置用户注册名称黑名单
 
-* feat: support admin create address && add ENABLE_USER_CREATE_EMAIL co… by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/175
-* feat: add SMTP proxy server by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/177
-* fix: cf ui var is string by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/178
-* fix: UI mailbox 100vh to 80vh by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/179
-* fix: smtp_proxy_server hostname && add docker image for linux/arm64 by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/180
-* fix: some browser do not support wasm by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/182
-* feat: add COPYRIGHT by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/183
-* feat: UI: add user page: useIframeShowMail && mailboxSplitSize by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/184
-* feat: add address_block_list for new address by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/185
+* feat: support admin create address && add ENABLE_USER_CREATE_EMAIL co… by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/175
+* feat: add SMTP proxy server by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/177
+* fix: cf ui var is string by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/178
+* fix: UI mailbox 100vh to 80vh by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/179
+* fix: smtp_proxy_server hostname && add docker image for linux/arm64 by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/180
+* fix: some browser do not support wasm by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/182
+* feat: add COPYRIGHT by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/183
+* feat: UI: add user page: useIframeShowMail && mailboxSplitSize by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/184
+* feat: add address_block_list for new address by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/185
 
 ## v0.3.0
 
@@ -486,11 +486,11 @@ set
 - `admin` 发件权限页面支持搜索地址
 - `admin` 邮件页面使用左右分栏 UI
 
-* feat: remove PREFIX logic in db by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/171
-* feat: admin page add account mail count && sendbox default all && sen… by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/172
-* feat: all mail use MailBox Component by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/173
+* feat: remove PREFIX logic in db by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/171
+* feat: admin page add account mail count && sendbox default all && sen… by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/172
+* feat: all mail use MailBox Component by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/173
 
-**Full Changelog**: https://github.com/dreamhunter2333/cloudflare_temp_email/compare/0.2.10...v0.3.0
+**Full Changelog**: https://github.com/DevilC0822/cloudflare_temp_email/compare/0.2.10...v0.3.0
 
 ## v0.2.10
 
@@ -499,8 +499,8 @@ set
 - fetchAddressError 提示改进
 - 自动刷新显示倒计时
 
-* feat: docs update by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/165
-* feat: add ENABLE_USER_DELETE_EMAIL && ENABLE_AUTO_REPLY && modify fetchAddressError i18n && UI: show autoRefreshInterval by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/169
+* feat: docs update by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/165
+* feat: add ENABLE_USER_DELETE_EMAIL && ENABLE_AUTO_REPLY && modify fetchAddressError i18n && UI: show autoRefreshInterval by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/169
 
 ## v0.2.9
 
@@ -516,11 +516,11 @@ set
 - 添加 RATE_LIMITER 限流 发送邮件 和 新建地址
 - 一些 bug 修复
 
-- feat: allow user delete mail && notify when send access changed by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/132
-- feat: requset_send_mail_access default 1 balance by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/143
-- fix: RATE_LIMITER not call jwt by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/146
-- fix: delete_address not delete address_sender by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/153
-- fix: send_balance not update when click sendmail by @dreamhunter2333 in https://github.com/dreamhunter2333/cloudflare_temp_email/pull/155
+- feat: allow user delete mail && notify when send access changed by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/132
+- feat: requset_send_mail_access default 1 balance by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/143
+- fix: RATE_LIMITER not call jwt by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/146
+- fix: delete_address not delete address_sender by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/153
+- fix: send_balance not update when click sendmail by @dreamhunter2333 in https://github.com/DevilC0822/cloudflare_temp_email/pull/155
 
 ## v0.2.7
 

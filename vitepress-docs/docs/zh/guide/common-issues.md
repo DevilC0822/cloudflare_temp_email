@@ -16,7 +16,7 @@
 | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
 | `Uncaught Error: No such module "path". imported from "worker.js"` | [参考](/zh/guide/ui/worker)                                                 |
 | `No such module "node:stream". imported from "worker.js"`          | [参考](/zh/guide/ui/worker)                                                 |
-| `二级域名无法发送邮件`                                             | [参考](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/515) |
+| `二级域名无法发送邮件`                                             | [参考](https://github.com/DevilC0822/cloudflare_temp_email/issues/515) |
 | `Failed to send verify code: No balance`                           | admin 后台设置无限制邮件或者发件权限页面增加额度                            |
 | `Github OAuth无法获取到邮箱 400 Failed to get user email`          | 需要 github 用户设置公开邮箱                                                |
 | `Cannot read properties of undefined (reading 'map')`              | worker 变量没有设置成功                                                     |

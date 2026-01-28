@@ -64,7 +64,7 @@ Can be deployed via command line or UI interface
 For other steps, refer to `Frontend and Backend Separation Deployment` in [UI Deployment](/en/guide/cli/pages)
 
 > [!NOTE]
-> Download the zip from here, [telegram-frontend.zip](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/telegram-frontend.zip)
+> Download the zip from here, [telegram-frontend.zip](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/telegram-frontend.zip)
 >
 > Modify the index-xxx.js file in the zip, where xx is a random string
 >

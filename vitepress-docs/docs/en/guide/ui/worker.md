@@ -16,7 +16,7 @@
 
     ![worker-runtime](/ui_install/worker-runtime.png)
 
-4. Download [worker.js](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/worker.js)
+4. Download [worker.js](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/worker.js)
 
 5. Go back to `Overview`, find the worker you just created, click `Edit Code`, delete the original file, upload `worker.js`, and click `Deploy`
 
@@ -25,7 +25,7 @@
     > then right-click in the file list window and find `Upload` in the context menu,
     > please refer to the screenshots below
     >
-    > Reference: [issues156](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/156#issuecomment-2079453822)
+    > Reference: [issues156](https://github.com/DevilC0822/cloudflare_temp_email/issues/156#issuecomment-2079453822)
 
     ![worker3](/ui_install/worker-3.png)
 

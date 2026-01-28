@@ -8,4 +8,4 @@ mail channel 已不被支持，下面参考中仅限收件部分。
 
 参考
 
-- [配置子域名邮箱](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/164#issuecomment-2082612710)
+- [配置子域名邮箱](https://github.com/DevilC0822/cloudflare_temp_email/issues/164#issuecomment-2082612710)

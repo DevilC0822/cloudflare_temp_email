@@ -64,7 +64,7 @@ const generate = async () => {
     </div>
 
     > [!NOTE]
-    > You can also deploy manually. Download the zip from here: [frontend.zip](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/frontend.zip)
+    > You can also deploy manually. Download the zip from here: [frontend.zip](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/frontend.zip)
     >
     > Modify the index-xxx.js file in the archive, where xx is a random string
     >

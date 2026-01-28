@@ -8,4 +8,4 @@ Mail channel is no longer supported. The reference below is limited to the recei
 
 Reference
 
-- [Configure Subdomain Email](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/164#issuecomment-2082612710)
+- [Configure Subdomain Email](https://github.com/DevilC0822/cloudflare_temp_email/issues/164#issuecomment-2082612710)

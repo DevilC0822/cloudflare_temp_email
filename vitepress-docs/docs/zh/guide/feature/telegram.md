@@ -64,7 +64,7 @@ Telegram Bot 支持中英文切换，用户可以通过 `/lang` 命令设置语�
 其他步骤参考 [UI 部署](/zh/guide/cli/pages) 中的 `前后端分离部署`
 
 > [!NOTE]
-> 从这里下载 zip, [telegram-frontend.zip](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/telegram-frontend.zip)
+> 从这里下载 zip, [telegram-frontend.zip](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/telegram-frontend.zip)
 >
 > 修改压缩包里面的 index-xxx.js 文件 ，xx 是随机的字符串
 >

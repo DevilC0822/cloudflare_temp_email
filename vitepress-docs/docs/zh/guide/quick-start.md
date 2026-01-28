@@ -16,7 +16,7 @@
 
 ## 升级流程
 
-首先确认当前的版本，然后访问 [Release 页面](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/) 和 [CHANGELOG 页面](https://github.com/dreamhunter2333/cloudflare_temp_email/blob/main/CHANGELOG.md) 中找到当前的版本
+首先确认当前的版本，然后访问 [Release 页面](https://github.com/DevilC0822/cloudflare_temp_email/releases/) 和 [CHANGELOG 页面](https://github.com/DevilC0822/cloudflare_temp_email/blob/main/CHANGELOG.md) 中找到当前的版本
 
 > [!WARNING] 注意
 > 需要注意 `Breaking Changes` 是必须进行 `数据库 sql 执行` 或者 `变量配置` 的

@@ -7,4 +7,4 @@
 
 ## Fork 仓库
 
-- 在 GitHub fork [本仓库](https://github.com/dreamhunter2333/cloudflare_temp_email.git)
+- 在 GitHub fork [本仓库](https://github.com/DevilC0822/cloudflare_temp_email.git)

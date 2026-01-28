@@ -24,7 +24,7 @@ This is a temporary email service that uses Cloudflare Workers to create a tempo
 
 ```bash
 npm install wrangler -g
-git clone https://github.com/dreamhunter2333/cloudflare_temp_email.git
+git clone https://github.com/DevilC0822/cloudflare_temp_email.git
 # Switch to the latest tag or the branch you want to deploy. You can also use the main branch directly.
 # git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 ```

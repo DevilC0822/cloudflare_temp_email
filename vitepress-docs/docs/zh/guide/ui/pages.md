@@ -64,7 +64,7 @@ const generate = async () => {
     </div>
 
     > [!NOTE]
-    > 你也可以手动部署，从这里下载 zip, [frontend.zip](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/frontend.zip)
+    > 你也可以手动部署，从这里下载 zip, [frontend.zip](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/frontend.zip)
     >
     > 修改压缩包里面的 index-xxx.js 文件 ，xx 是随机的字符串
     >

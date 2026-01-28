@@ -16,7 +16,7 @@
 
     ![worker-runtime](/ui_install/worker-runtime.png)
 
-4. 下载 [worker.js](https://github.com/dreamhunter2333/cloudflare_temp_email/releases/latest/download/worker.js)
+4. 下载 [worker.js](https://github.com/DevilC0822/cloudflare_temp_email/releases/latest/download/worker.js)
 
 5. 回到 `Overview`，找到刚刚创建的 worker，点击 `Edit Code`, 删除原来的文件，上传 `worker.js`, 点击 `Deploy`
 
@@ -25,7 +25,7 @@
     > 在文件列表的窗口里点击鼠标右键，在右键菜单里找到 `Upload`,
     > 请参考下面的截图
     >
-    > 参考: [issues156](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/156#issuecomment-2079453822)
+    > 参考: [issues156](https://github.com/DevilC0822/cloudflare_temp_email/issues/156#issuecomment-2079453822)
 
     ![worker3](/ui_install/worker-3.png)
 

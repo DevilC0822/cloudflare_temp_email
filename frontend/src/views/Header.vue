@@ -194,7 +194,7 @@ const menuOptions = computed(() => [
                 style: "width: 100%",
                 tag: "a",
                 target: "_blank",
-                href: "https://github.com/dreamhunter2333/cloudflare_temp_email",
+                href: "https://github.com/DevilC0822/cloudflare_temp_email",
             },
             {
                 default: () => version || "Github",
@@ -282,7 +282,7 @@ onMounted(async () => {
                         <n-icon :component="Language" />
                     </n-button>
                     <n-button v-if="openSettings?.showGithub" quaternary tag="a" target="_blank"
-                        href="https://github.com/dreamhunter2333/cloudflare_temp_email">
+                        href="https://github.com/DevilC0822/cloudflare_temp_email">
                         <template #icon><n-icon :component="GithubAlt" /></template>
                         {{ version || 'GitHub' }}
                     </n-button>

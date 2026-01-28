@@ -16,7 +16,7 @@
 | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
 | `Uncaught Error: No such module "path". imported from "worker.js"` | [Reference](/en/guide/ui/worker)                                            |
 | `No such module "node:stream". imported from "worker.js"`          | [Reference](/en/guide/ui/worker)                                            |
-| `Subdomain cannot send emails`                                     | [Reference](https://github.com/dreamhunter2333/cloudflare_temp_email/issues/515) |
+| `Subdomain cannot send emails`                                     | [Reference](https://github.com/DevilC0822/cloudflare_temp_email/issues/515) |
 | `Failed to send verify code: No balance`                           | Set unlimited emails in admin console or increase quota on the sending permission page |
 | `Github OAuth unable to get email 400 Failed to get user email`    | GitHub user needs to set email to public                                    |
 | `Cannot read properties of undefined (reading 'map')`              | Worker variables not set successfully                                       |
