@@ -81,6 +81,7 @@ const { t } = useI18n({
       refresh: 'Refresh',
       showCode: 'Change View Original Code',
       pleaseSelectMail: "Please select a mail to view.",
+      noSubject: 'No Subject',
       delete: 'Delete',
       deleteMailTip: 'Are you sure you want to delete mail?',
       multiAction: 'Batch',
@@ -93,6 +94,7 @@ const { t } = useI18n({
       refresh: '刷新',
       showCode: '切换查看元数据',
       pleaseSelectMail: "请选择一封邮件查看。",
+      noSubject: '无主题',
       delete: '删除',
       deleteMailTip: '确定要删除邮件吗?',
       multiAction: '批量',
@@ -262,33 +264,37 @@ onMounted(async () => {
   <div ref="rootRef">
     <div v-if="useSplitView" class="left">
       <div class="sendbox-toolbar">
-        <n-space v-if="multiActionMode">
-          <n-button @click="multiActionModeClick(false)" tertiary>
-            {{ t('cancelMultiAction') }}
-          </n-button>
-          <n-button @click="multiActionSelectAll(true)" tertiary>
-            {{ t('selectAll') }}
-          </n-button>
-          <n-button @click="multiActionSelectAll(false)" tertiary>
-            {{ t('unselectAll') }}
-          </n-button>
-          <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="multiActionDeleteMail">
-            <template #trigger>
-              <n-button tertiary type="error">{{ t('delete') }}</n-button>
-            </template>
-            {{ t('deleteMailTip') }}
-          </n-popconfirm>
-        </n-space>
-        <n-space v-else>
-          <n-button v-if="showMultiActionMode" @click="multiActionModeClick(true)" type="primary" tertiary>
-            {{ t('multiAction') }}
-          </n-button>
+        <div class="sendbox-toolbar__group">
+          <template v-if="multiActionMode">
+            <n-button @click="multiActionModeClick(false)" tertiary>
+              {{ t('cancelMultiAction') }}
+            </n-button>
+            <n-button @click="multiActionSelectAll(true)" tertiary>
+              {{ t('selectAll') }}
+            </n-button>
+            <n-button @click="multiActionSelectAll(false)" tertiary>
+              {{ t('unselectAll') }}
+            </n-button>
+            <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="multiActionDeleteMail">
+              <template #trigger>
+                <n-button tertiary type="error">{{ t('delete') }}</n-button>
+              </template>
+              {{ t('deleteMailTip') }}
+            </n-popconfirm>
+          </template>
+          <template v-else>
+            <n-button v-if="showMultiActionMode" @click="multiActionModeClick(true)" type="primary" tertiary>
+              {{ t('multiAction') }}
+            </n-button>
+          </template>
+        </div>
+        <div class="sendbox-toolbar__group sendbox-toolbar__group--right">
           <n-pagination class="sendbox-pager" v-model:page="page" v-model:page-size="pageSize" :item-count="count"
             :page-sizes="[20, 50, 100]" show-size-picker />
           <n-button @click="refresh" type="primary" tertiary>
             {{ t('refresh') }}
           </n-button>
-        </n-space>
+        </div>
       </div>
       <n-split class="sendbox-split" direction="horizontal" :max="splitState.max" :min="splitState.min"
         :size="splitState.size" :pane1-style="{ minWidth: '0' }" :pane2-style="{ minWidth: '0', padding: '8px' }"
@@ -299,27 +305,37 @@ onMounted(async () => {
               <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)"
                 :class="mailItemClass(row)">
                 <template #prefix v-if="multiActionMode">
-                  <n-checkbox v-model:checked="row.checked" />
+                  <n-checkbox v-model:checked="row.checked" @click.stop />
                 </template>
-                <n-thing :title="row.subject">
-                  <template #description>
-                    <n-text depth="3" class="sendbox-meta">
-                      #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+                <div class="send-row__content">
+                  <div class="send-row__top">
+                    <n-ellipsis class="send-row__subject" :tooltip="true">
+                      {{ row.subject || t('noSubject') }}
+                    </n-ellipsis>
+                    <n-text depth="3" class="send-row__time">
+                      {{ utcToLocalDate(row.created_at, useUTCDate) }}
                     </n-text>
-                    <n-text depth="3" class="sendbox-meta">
-                      <n-ellipsis style="max-width: 520px;">
-                        {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
-                      </n-ellipsis>
+                  </div>
+                  <div class="send-row__meta">
+                    <n-text depth="3" class="send-row__id">
+                      #{{ row.id }}
                     </n-text>
-                  </template>
-                </n-thing>
+                    <n-ellipsis class="send-row__to" :tooltip="true">
+                      {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
+                    </n-ellipsis>
+                  </div>
+                </div>
               </n-list-item>
             </n-list>
           </div>
         </template>
         <template #2>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll sendbox-detail"
-            :title="curMail.subject">
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll sendbox-detail">
+            <template #header>
+              <n-ellipsis class="sendbox-detail__title" :tooltip="true">
+                {{ curMail.subject || t('noSubject') }}
+              </n-ellipsis>
+            </template>
             <template #header-extra>
               <n-flex align="center" justify="end" :wrap="true" class="sendbox-detail__actions">
                 <n-button size="small" tertiary type="info" @click="showCode = !showCode">
@@ -374,25 +390,31 @@ onMounted(async () => {
       <div class="mail-list-scroll mail-list-scroll--mobile">
         <n-list hoverable clickable>
           <n-list-item v-for="row in data" v-bind:key="row.id" @click="() => clickRow(row)">
-            <n-thing :title="row.subject">
-              <template #description>
-                <n-text depth="3" class="sendbox-meta">
-                  #{{ row.id }} · {{ utcToLocalDate(row.created_at, useUTCDate) }}
+            <div class="send-row__content">
+              <div class="send-row__top">
+                <n-ellipsis class="send-row__subject" :tooltip="true">
+                  {{ row.subject || t('noSubject') }}
+                </n-ellipsis>
+                <n-text depth="3" class="send-row__time">
+                  {{ utcToLocalDate(row.created_at, useUTCDate) }}
                 </n-text>
-                <n-text depth="3" class="sendbox-meta">
-                  <n-ellipsis style="max-width: 520px;">
-                    {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
-                  </n-ellipsis>
+              </div>
+              <div class="send-row__meta">
+                <n-text depth="3" class="send-row__id">
+                  #{{ row.id }}
                 </n-text>
-              </template>
-            </n-thing>
+                <n-ellipsis class="send-row__to" :tooltip="true">
+                  {{ showEMailFrom ? (row.address + " → " + row.to_mail) : row.to_mail }}
+                </n-ellipsis>
+              </div>
+            </div>
           </n-list-item>
         </n-list>
       </div>
       <n-drawer v-model:show="showDetailDrawer" width="100%" placement="bottom" :trap-focus="false"
         :block-scroll="false"
         style="height: 80vh;">
-        <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
+        <n-drawer-content :title="curMail ? (curMail.subject || t('noSubject')) : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;">
             <div class="sendbox-detail__drawer-head">
               <n-flex align="center" justify="end" :wrap="true" class="sendbox-detail__actions">
@@ -456,7 +478,8 @@ onMounted(async () => {
 }
 
 .mail-list-scroll {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   height: calc(100vh - 240px);
   padding: 2px;
   border-radius: var(--app-radius);
@@ -466,6 +489,24 @@ onMounted(async () => {
 
 .sendbox-toolbar {
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sendbox-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.sendbox-toolbar__group--right {
+  justify-content: flex-end;
+  flex: 1 1 420px;
 }
 
 .sendbox-pager {
@@ -476,17 +517,61 @@ onMounted(async () => {
   margin-right: 6px;
 }
 
-.sendbox-meta {
-  display: block;
-  line-height: 1.3;
-}
-
 .mail-list-scroll--mobile {
   height: calc(100vh - 320px);
 }
 
+.send-row__content {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.send-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.send-row__subject {
+  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.send-row__time {
+  flex: 0 0 auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.send-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.send-row__id {
+  flex: 0 0 auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.send-row__to {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .mail-row {
   border-radius: 12px;
+  cursor: pointer;
   transition: background var(--app-duration) var(--app-ease), border-color var(--app-duration) var(--app-ease);
 }
 
@@ -502,6 +587,12 @@ onMounted(async () => {
 
 .sendbox-detail__actions {
   gap: 8px;
+}
+
+.sendbox-detail__title {
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 600;
 }
 
 .sendbox-detail__drawer-head {
@@ -527,6 +618,19 @@ onMounted(async () => {
 
 .sendbox-detail__html {
   margin: 0;
+}
+
+:deep(.n-list),
+:deep(.n-list-item__main) {
+  min-width: 0;
+}
+
+:deep(.n-list-item__main) {
+  width: 100%;
+}
+
+:deep(.n-ellipsis) {
+  max-width: 100%;
 }
 
 :global(html.dark) .mail-row--active {
