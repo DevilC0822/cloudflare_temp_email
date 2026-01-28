@@ -1,6 +1,6 @@
 <template>
-    <div v-if="useFallback" v-html="htmlContent"></div>
-    <div v-else ref="shadowHost"></div>
+    <div v-if="useFallback" class="mail-safe" v-html="htmlContent"></div>
+    <div v-else ref="shadowHost" class="shadow-html-host"></div>
 </template>
 
 <script setup>
@@ -16,6 +16,42 @@ const props = defineProps({
 const shadowHost = ref(null);
 let shadowRoot = null;
 const useFallback = ref(false);
+
+// Shadow DOM 内不会继承全局样式（例如 img/table 的 max-width 限制），
+// 这里注入一层“防溢出”基础样式，避免邮件正文撑破布局。
+const BASE_CSS = `
+  :host {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    color: inherit;
+    font-family: inherit;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+  img, video, canvas, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  table {
+    max-width: 100% !important;
+  }
+  pre, code {
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+  a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+`;
 
 /**
  * Renders content into Shadow DOM with fallback to v-html
@@ -40,7 +76,7 @@ const renderShadowDom = () => {
 
         // Update content if Shadow DOM exists
         if (shadowRoot) {
-            shadowRoot.innerHTML = props.htmlContent;
+            shadowRoot.innerHTML = `<style>${BASE_CSS}</style>${props.htmlContent}`;
         }
     } catch (error) {
         console.error('Failed to render Shadow DOM, falling back to v-html:', error);
@@ -73,3 +109,11 @@ watch(() => props.htmlContent, () => {
     renderShadowDom();
 }, { flush: 'post' });
 </script>
+
+<style scoped>
+.shadow-html-host {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+</style>

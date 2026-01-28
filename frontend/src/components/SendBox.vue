@@ -2,12 +2,20 @@
 import { watch, onMounted, ref, computed } from "vue";
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import { useElementSize } from '@vueuse/core'
 import { useGlobalState } from '../store'
 import { useIsMobile } from '../utils/composables'
 import { utcToLocalDate } from '../utils';
 
 const message = useMessage()
 const isMobile = useIsMobile()
+
+const rootRef = ref(null)
+const { width: rootWidth } = useElementSize(rootRef)
+
+const LIST_MIN_PX = 320
+const DETAIL_MIN_PX = 520
+const SPLIT_MIN_TOTAL = LIST_MIN_PX + DETAIL_MIN_PX + 64
 
 const props = defineProps({
   enableUserDeleteEmail: {
@@ -39,11 +47,32 @@ const page = ref(1)
 const pageSize = ref(20)
 
 const curMail = ref(null);
+const showDetailDrawer = ref(false)
 const showCode = ref(false)
 
 const multiActionMode = ref(false)
 const showMultiActionDelete = ref(false)
 const multiActionDeleteProgress = ref({ percentage: 0, tip: '0/0' })
+
+const useSplitView = computed(() => {
+  if (isMobile.value) return false
+  return (rootWidth.value || 0) >= SPLIT_MIN_TOTAL
+})
+
+const splitState = computed(() => {
+  const width = rootWidth.value || 0
+  if (!width) {
+    return {
+      min: 0.25,
+      max: 0.75,
+      size: mailboxSplitSize.value
+    }
+  }
+  const min = Math.max(0.18, LIST_MIN_PX / width)
+  const max = Math.min(0.82, (width - DETAIL_MIN_PX) / width)
+  const size = Math.min(Math.max(mailboxSplitSize.value, min), max)
+  return { min, max, size }
+})
 
 const { t } = useI18n({
   messages: {
@@ -111,8 +140,9 @@ const refresh = async () => {
     if (totalCount > 0) {
       count.value = totalCount;
     }
-    if (!isMobile.value && !curMail.value && data.value.length > 0) {
+    if (useSplitView.value && !curMail.value && data.value.length > 0) {
       curMail.value = data.value[0];
+      showCode.value = false
     }
   } catch (error) {
     message.error(error.message || "error");
@@ -122,6 +152,10 @@ const refresh = async () => {
 
 const clickRow = async (row) => {
   curMail.value = row;
+  showCode.value = false
+  if (!useSplitView.value) {
+    showDetailDrawer.value = true
+  }
 };
 
 const mailItemClass = (row) => {
@@ -140,6 +174,7 @@ const deleteMail = async () => {
     await props.deleteMail(curMail.value.id);
     message.success(t("success"));
     curMail.value = null;
+    showDetailDrawer.value = false
     await refresh();
   } catch (error) {
     message.error(error.message || "error");
@@ -200,14 +235,32 @@ const multiActionDeleteMail = async () => {
   }
 }
 
+watch(useSplitView, (split) => {
+  if (split) {
+    showDetailDrawer.value = false
+    if (!curMail.value && data.value.length > 0) {
+      curMail.value = data.value[0]
+      showCode.value = false
+    }
+    return
+  }
+  showDetailDrawer.value = false
+})
+
+watch(showDetailDrawer, (show) => {
+  if (!show && !useSplitView.value) {
+    curMail.value = null
+  }
+})
+
 onMounted(async () => {
   await refresh();
 });
 </script>
 
 <template>
-  <div>
-    <div v-if="!isMobile" class="left">
+  <div ref="rootRef">
+    <div v-if="useSplitView" class="left">
       <div class="sendbox-toolbar">
         <n-space v-if="multiActionMode">
           <n-button @click="multiActionModeClick(false)" tertiary>
@@ -230,16 +283,15 @@ onMounted(async () => {
           <n-button v-if="showMultiActionMode" @click="multiActionModeClick(true)" type="primary" tertiary>
             {{ t('multiAction') }}
           </n-button>
-          <div style="display: inline-block; margin-right: 10px;">
-            <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count"
-              :page-sizes="[20, 50, 100]" show-size-picker />
-          </div>
+          <n-pagination class="sendbox-pager" v-model:page="page" v-model:page-size="pageSize" :item-count="count"
+            :page-sizes="[20, 50, 100]" show-size-picker />
           <n-button @click="refresh" type="primary" tertiary>
             {{ t('refresh') }}
           </n-button>
         </n-space>
       </div>
-      <n-split direction="horizontal" :max="0.75" :min="0.25" :default-size="mailboxSplitSize"
+      <n-split class="sendbox-split" direction="horizontal" :max="splitState.max" :min="splitState.min"
+        :size="splitState.size" :pane1-style="{ minWidth: '0' }" :pane2-style="{ minWidth: '0', padding: '8px' }"
         :on-update:size="onSpiltSizeChange">
         <template #1>
           <div class="mail-list-scroll">
@@ -266,33 +318,43 @@ onMounted(async () => {
           </div>
         </template>
         <template #2>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll" :title="curMail.subject">
-            <n-space>
-              <n-tag type="info">
-                ID: {{ curMail.id }}
-              </n-tag>
-              <n-tag type="info">
-                {{ utcToLocalDate(curMail.created_at, useUTCDate) }}
-              </n-tag>
-              <n-tag type="info">
-                FROM: {{ curMail.address }}
-              </n-tag>
-              <n-tag type="info">
-                TO: {{ curMail.to_mail }}
-              </n-tag>
-              <n-button size="small" tertiary type="info" @click="showCode = !showCode">
-                {{ t('showCode') }}
-              </n-button>
-              <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="deleteMail">
-                <template #trigger>
-                  <n-button tertiary type="error" size="small">{{ t('delete') }}</n-button>
-                </template>
-                {{ t('deleteMailTip') }}
-              </n-popconfirm>
-            </n-space>
-            <pre v-if="showCode" style="margin-top: 10px;">{{ curMail.raw }}</pre>
-            <pre v-else-if="!curMail.is_html" style="margin-top: 10px;">{{ curMail.content }}</pre>
-            <div v-else v-html="curMail.content" style="margin-top: 10px;"></div>
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll sendbox-detail"
+            :title="curMail.subject">
+            <template #header-extra>
+              <n-flex align="center" justify="end" :wrap="true" class="sendbox-detail__actions">
+                <n-button size="small" tertiary type="info" @click="showCode = !showCode">
+                  {{ t('showCode') }}
+                </n-button>
+                <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="deleteMail">
+                  <template #trigger>
+                    <n-button tertiary type="error" size="small">{{ t('delete') }}</n-button>
+                  </template>
+                  {{ t('deleteMailTip') }}
+                </n-popconfirm>
+              </n-flex>
+            </template>
+
+            <div class="sendbox-detail__meta">
+              <n-text depth="3" class="sendbox-detail__meta-line">
+                #{{ curMail.id }} · {{ utcToLocalDate(curMail.created_at, useUTCDate) }}
+              </n-text>
+              <n-text depth="3" class="sendbox-detail__meta-line" v-if="showEMailFrom">
+                <n-ellipsis style="max-width: 100%;" :tooltip="true">
+                  FROM: {{ curMail.address }}
+                </n-ellipsis>
+              </n-text>
+              <n-text depth="3" class="sendbox-detail__meta-line">
+                <n-ellipsis style="max-width: 100%;" :tooltip="true">
+                  TO: {{ curMail.to_mail }}
+                </n-ellipsis>
+              </n-text>
+            </div>
+
+            <div class="sendbox-detail__body mail-safe">
+              <pre v-if="showCode">{{ curMail.raw }}</pre>
+              <pre v-else-if="!curMail.is_html">{{ curMail.content }}</pre>
+              <div v-else v-html="curMail.content" class="sendbox-detail__html"></div>
+            </div>
           </n-card>
           <n-card :bordered="false" embedded class="mail-item" v-else>
             <n-result status="info" :title="t('pleaseSelectMail')">
@@ -303,9 +365,8 @@ onMounted(async () => {
     </div>
     <div class="left" v-else>
       <div class="center">
-        <div style="display: inline-block; margin-right: 10px;">
-          <n-pagination v-model:page="page" v-model:page-size="pageSize" :item-count="count" simple size="small" />
-        </div>
+        <n-pagination class="sendbox-pager sendbox-pager--compact" v-model:page="page" v-model:page-size="pageSize"
+          :item-count="count" simple size="small" />
         <n-button @click="refresh" size="small" type="primary">
           {{ t('refresh') }}
         </n-button>
@@ -328,36 +389,44 @@ onMounted(async () => {
           </n-list-item>
         </n-list>
       </div>
-      <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
+      <n-drawer v-model:show="showDetailDrawer" width="100%" placement="bottom" :trap-focus="false"
+        :block-scroll="false"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;">
-            <n-space>
-              <n-tag type="info">
-                ID: {{ curMail.id }}
-              </n-tag>
-              <n-tag type="info">
-                {{ utcToLocalDate(curMail.created_at, useUTCDate) }}
-              </n-tag>
-              <n-tag type="info">
-                FROM: {{ curMail.address }}
-              </n-tag>
-              <n-tag type="info">
-                TO: {{ curMail.to_mail }}
-              </n-tag>
-              <n-button size="small" tertiary type="info" @click="showCode = !showCode">
-                {{ t('showCode') }}
-              </n-button>
-              <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="deleteMail">
-                <template #trigger>
-                  <n-button tertiary type="error" size="small">{{ t('delete') }}</n-button>
-                </template>
-                {{ t('deleteMailTip') }}
-              </n-popconfirm>
-            </n-space>
-            <pre v-if="showCode" style="margin-top: 10px;">{{ curMail.raw }}</pre>
-            <pre v-else-if="!curMail.is_html" style="margin-top: 10px;">{{ curMail.content }}</pre>
-            <div v-else v-html="curMail.content" style="margin-top: 10px;"></div>
+            <div class="sendbox-detail__drawer-head">
+              <n-flex align="center" justify="end" :wrap="true" class="sendbox-detail__actions">
+                <n-button size="small" tertiary type="info" @click="showCode = !showCode">
+                  {{ t('showCode') }}
+                </n-button>
+                <n-popconfirm v-if="enableUserDeleteEmail" @positive-click="deleteMail">
+                  <template #trigger>
+                    <n-button tertiary type="error" size="small">{{ t('delete') }}</n-button>
+                  </template>
+                  {{ t('deleteMailTip') }}
+                </n-popconfirm>
+              </n-flex>
+            </div>
+            <div class="sendbox-detail__meta">
+              <n-text depth="3" class="sendbox-detail__meta-line">
+                #{{ curMail.id }} · {{ utcToLocalDate(curMail.created_at, useUTCDate) }}
+              </n-text>
+              <n-text depth="3" class="sendbox-detail__meta-line" v-if="showEMailFrom">
+                <n-ellipsis style="max-width: 100%;" :tooltip="true">
+                  FROM: {{ curMail.address }}
+                </n-ellipsis>
+              </n-text>
+              <n-text depth="3" class="sendbox-detail__meta-line">
+                <n-ellipsis style="max-width: 100%;" :tooltip="true">
+                  TO: {{ curMail.to_mail }}
+                </n-ellipsis>
+              </n-text>
+            </div>
+            <div class="sendbox-detail__body mail-safe">
+              <pre v-if="showCode">{{ curMail.raw }}</pre>
+              <pre v-else-if="!curMail.is_html">{{ curMail.content }}</pre>
+              <div v-else v-html="curMail.content" class="sendbox-detail__html"></div>
+            </div>
           </n-card>
         </n-drawer-content>
       </n-drawer>
@@ -370,8 +439,16 @@ onMounted(async () => {
   text-align: left;
 }
 
+.sendbox-split {
+  min-width: 0;
+}
+
 .center {
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .mail-item {
@@ -389,6 +466,14 @@ onMounted(async () => {
 
 .sendbox-toolbar {
   margin-bottom: 10px;
+}
+
+.sendbox-pager {
+  display: inline-flex;
+}
+
+.sendbox-pager--compact {
+  margin-right: 6px;
 }
 
 .sendbox-meta {
@@ -413,6 +498,35 @@ onMounted(async () => {
 .mail-content-scroll {
   overflow: auto;
   max-height: calc(100vh - 240px);
+}
+
+.sendbox-detail__actions {
+  gap: 8px;
+}
+
+.sendbox-detail__drawer-head {
+  margin-bottom: 8px;
+}
+
+.sendbox-detail__meta {
+  margin-bottom: 10px;
+}
+
+.sendbox-detail__meta-line {
+  display: block;
+  line-height: 1.35;
+}
+
+.sendbox-detail__body {
+  min-width: 0;
+}
+
+.sendbox-detail__body pre {
+  margin: 0;
+}
+
+.sendbox-detail__html {
+  margin: 0;
 }
 
 :global(html.dark) .mail-row--active {

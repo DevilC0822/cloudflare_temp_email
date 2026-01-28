@@ -204,6 +204,21 @@ video {
   min-width: 0;
 }
 
+/* 邮件内容防溢出：用于 v-html / 非 Shadow DOM 场景 */
+.mail-safe {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.mail-safe pre,
+.mail-safe code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 /* 跳转主内容（可访问性） */
 .app-skip-link {
   position: absolute;

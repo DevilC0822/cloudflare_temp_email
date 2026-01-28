@@ -2,6 +2,7 @@
 import { watch, onMounted, ref, onBeforeUnmount, computed } from "vue";
 import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import { useElementSize } from '@vueuse/core'
 import { useGlobalState } from '../store'
 import { CloudDownloadRound, ArrowBackIosNewFilled, ArrowForwardIosFilled } from '@vicons/material'
 import { useIsMobile } from '../utils/composables'
@@ -12,6 +13,13 @@ import AiExtractInfo from "./AiExtractInfo.vue";
 
 const message = useMessage()
 const isMobile = useIsMobile()
+
+const rootRef = ref(null)
+const { width: rootWidth } = useElementSize(rootRef)
+
+const LIST_MIN_PX = 320
+const DETAIL_MIN_PX = 560
+const SPLIT_MIN_TOTAL = LIST_MIN_PX + DETAIL_MIN_PX + 64
 
 const props = defineProps({
   enableUserDeleteEmail: {
@@ -130,6 +138,27 @@ const nextMail = async () => {
 }
 
 const curMail = ref(null);
+const showDetailDrawer = ref(false)
+
+const useSplitView = computed(() => {
+  if (isMobile.value) return false
+  return (rootWidth.value || 0) >= SPLIT_MIN_TOTAL
+})
+
+const splitState = computed(() => {
+  const width = rootWidth.value || 0
+  if (!width) {
+    return {
+      min: 0.25,
+      max: 0.75,
+      size: mailboxSplitSize.value
+    }
+  }
+  const min = Math.max(0.18, LIST_MIN_PX / width)
+  const max = Math.min(0.82, (width - DETAIL_MIN_PX) / width)
+  const size = Math.min(Math.max(mailboxSplitSize.value, min), max)
+  return { min, max, size }
+})
 
 const multiActionMode = ref(false)
 const showMultiActionDownload = ref(false)
@@ -233,7 +262,8 @@ const refresh = async () => {
       count.value = totalCount;
     }
     curMail.value = null;
-    if (!isMobile.value && data.value.length > 0) {
+    showDetailDrawer.value = false
+    if (useSplitView.value && data.value.length > 0) {
       curMail.value = data.value[0];
     }
   } catch (error) {
@@ -255,7 +285,28 @@ const clickRow = async (row) => {
     return;
   }
   curMail.value = row;
+  if (!useSplitView.value) {
+    showDetailDrawer.value = true
+  }
 };
+
+watch(useSplitView, (split) => {
+  if (split) {
+    showDetailDrawer.value = false
+    if (!curMail.value && data.value.length > 0) {
+      curMail.value = data.value[0]
+    }
+    return
+  }
+  // 容器变窄时，避免详情被“挤”在右侧，交给抽屉承载
+  showDetailDrawer.value = false
+})
+
+watch(showDetailDrawer, (show) => {
+  if (!show && !useSplitView.value) {
+    curMail.value = null
+  }
+})
 
 
 const mailItemClass = (row) => {
@@ -398,8 +449,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <div v-if="!isMobile" class="left">
+  <div ref="rootRef">
+    <div v-if="useSplitView" class="left">
       <div class="mail-toolbar">
         <n-space v-if="multiActionMode" align="center">
           <n-button @click="multiActionModeClick(false)" tertiary>
@@ -445,7 +496,8 @@ onBeforeUnmount(() => {
             :placeholder="t('keywordQueryTip')" class="mail-filter-input" clearable />
         </n-space>
       </div>
-      <n-split class="left" direction="horizontal" :max="0.75" :min="0.25" :default-size="mailboxSplitSize"
+      <n-split class="mailbox-split" direction="horizontal" :max="splitState.max" :min="splitState.min"
+        :size="splitState.size" :pane1-style="{ minWidth: '0' }" :pane2-style="{ minWidth: '0', padding: '8px' }"
         :on-update:size="onSpiltSizeChange">
         <template #1>
           <div class="mail-list-scroll">
@@ -473,27 +525,28 @@ onBeforeUnmount(() => {
           </div>
         </template>
         <template #2>
-          <div v-if="curMail" style="margin: 8px;">
-            <n-flex justify="space-between">
-              <n-button @click="prevMail" :disabled="!canGoPrevMail" text size="small">
-                <template #icon>
-                  <n-icon>
-                    <ArrowBackIosNewFilled />
-                  </n-icon>
-                </template>
-                {{ t('prevMail') }}
-              </n-button>
-              <n-button @click="nextMail" :disabled="!canGoNextMail" text size="small" icon-placement="right">
-                <template #icon>
-                  <n-icon>
-                    <ArrowForwardIosFilled />
-                  </n-icon>
-                </template>
-                {{ t('nextMail') }}
-              </n-button>
-            </n-flex>
-          </div>
-          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll" :title="curMail.subject">
+          <n-card :bordered="false" embedded v-if="curMail" class="mail-item mail-content-scroll mail-detail-card"
+            :title="curMail.subject">
+            <template #header-extra>
+              <n-flex align="center" :wrap="false" class="mail-detail-nav">
+                <n-button @click="prevMail" :disabled="!canGoPrevMail" text size="small">
+                  <template #icon>
+                    <n-icon>
+                      <ArrowBackIosNewFilled />
+                    </n-icon>
+                  </template>
+                  {{ t('prevMail') }}
+                </n-button>
+                <n-button @click="nextMail" :disabled="!canGoNextMail" text size="small" icon-placement="right">
+                  {{ t('nextMail') }}
+                  <template #icon>
+                    <n-icon>
+                      <ArrowForwardIosFilled />
+                    </n-icon>
+                  </template>
+                </n-button>
+              </n-flex>
+            </template>
             <MailContentRenderer :mail="curMail" :showEMailTo="showEMailTo"
               :enableUserDeleteEmail="enableUserDeleteEmail" :showReply="showReply" :showSaveS3="showSaveS3"
               :onDelete="deleteMail" :onReply="replyMail" :onForward="forwardMail" :onSaveToS3="saveToS3Proxy" />
@@ -543,7 +596,8 @@ onBeforeUnmount(() => {
           </n-list-item>
         </n-list>
       </div>
-      <n-drawer v-model:show="curMail" width="100%" placement="bottom" :trap-focus="false" :block-scroll="false"
+      <n-drawer v-model:show="showDetailDrawer" width="100%" placement="bottom" :trap-focus="false"
+        :block-scroll="false"
         style="height: 80vh;">
         <n-drawer-content :title="curMail ? curMail.subject : ''" closable>
           <n-card :bordered="false" embedded style="overflow: auto;">
@@ -581,6 +635,14 @@ onBeforeUnmount(() => {
 <style scoped>
 .left {
   text-align: left;
+}
+
+.mailbox-split {
+  min-width: 0;
+}
+
+.mail-detail-nav {
+  gap: 6px;
 }
 
 .center {
